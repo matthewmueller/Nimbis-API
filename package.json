@@ -8,9 +8,12 @@
   "dependencies": {
     "express" : "*",
     "passport" : "*",
-    "redis-client" : "*"
+    "redis" : "*",
+    "underscore" : "*"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "request" : "*"
+  },
   "optionalDependencies": {},
   "engines": {
     "node": ">= 0.4.11"
