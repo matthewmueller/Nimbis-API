@@ -19,15 +19,14 @@ User.prototype.attributes = {};
  * Create a user
  */
 User.prototype.create = function(user, fn) {
-
   user = _.extend(this.attributes, user);
-  
-  // Add a userID
-  // user.id = user.id || base.id(6);
 
+  // Generate salt
+  var salt = base.salt();
+  
   // Save for later //
-  // user.password = this.encrypt(salt, user.password);
-  // user.salt = salt;
+  user.password = base.encrypt(salt, user.password);
+  user.salt = salt;
 
   var queue = redis.multi();
 
@@ -39,19 +38,38 @@ User.prototype.create = function(user, fn) {
   queue.hset('i:email:username', user.email, user.username);
 
   // Save to database
-  queue.exec(function(err) {
-    return fn(err);
+  queue.exec(fn);
+};
+
+/*
+ * Check if a user exists
+ */
+User.exists = function(username, fn) {
+  redis.hget('user:' + username, 'email', function(err, email) {
+    if(err) return fn(err);
+    else if(email) return fn(null, true);
+
+    return fn(null, false);
   });
 };
 
 /*
- * Find a user
+ * Authenticate a user
  */
-User.find = function(username, fn) {
+User.authenticate = function(username, password, fn) {
   redis.hgetall('user:' + username, function(err, user) {
     if(err) return fn(err);
-    if(!user) return fn(null);
+    // TODO, maybe use User.exists
+    if(!user.username) return fn(null);
 
-    return fn(null, user);
+    // Encrypt the supplied password
+    password = base.encrypted(user.salt, password);
+
+    // Does it match?
+    if(password === user.password) {
+      return fn(null, user);
+    } else {
+      return fn(null);
+    }
   });
 };

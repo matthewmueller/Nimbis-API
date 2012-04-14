@@ -57,9 +57,25 @@ redis.on('error', function() {
  *
  */
 
-var user = require('./controllers/users');
+var basicAuth = function(req, res, next) {
+  var User = require('./models/user');
+  express.basicAuth(function(user, pass, fn) {
+    User.authenticate(user, pass, fn);
+  }).apply(this, arguments);
+};
+
+var user = require('./controllers/users'),
+    group = require('./controllers/groups'),
+    message = require('./controllers/messages');
+
+// Group
+app.post('/groups', group.create);
+app.get('/groups/:id', group.show);
 
 // User
 app.post('/users', user.create);
 app.get('/users/:username', user.show);
+app.post('/users/:username/join', basicAuth, user.join);
 
+// Messages
+app.get('/messages', message.index);

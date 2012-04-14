@@ -10,14 +10,14 @@ exports.index = function(req, res) {
 exports.create = function(req, res) {
   var body = req.body;
 
-  User.find(body.username, function(err, user) {
+  User.exists(body.username, function(err, exists) {
     if(err) res.send(err);
-    else if(user) res.send("This user already exists!");
+    if(exists) res.send("This user already exists!");
 
-    user = new User();
+    var user = new User();
     user.create(body, function(err) {
       if(err) res.send(err);
-      res.send('created a new user');
+      res.send('Successfully created group: ' + body.username);
     }); 
   });
 };
@@ -25,9 +25,9 @@ exports.create = function(req, res) {
 // GET /users/:username
 // curl -HAccept:text/json localhost:8080/users/matt
 exports.show = function(req, res) {
-  var body = req.body;
+  var params = req.params;
 
-  User.find(body.username, function(err, user) {
+  User.find(params.username, function(err, user) {
     if(err) res.send(err);
     else if(!user) res.send('Couldn\'t find user');
 
