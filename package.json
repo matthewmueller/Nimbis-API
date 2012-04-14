@@ -1,0 +1,18 @@
+{
+  "author": "Matt Mueller <mattmuelle@gmail.com>",
+  "name": "api.nimbis",
+  "private" : true,
+  "description": "Nimbis api",
+  "version": "0.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "express" : "*",
+    "passport" : "*",
+    "redis-client" : "*"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": ">= 0.4.11"
+  }
+}
