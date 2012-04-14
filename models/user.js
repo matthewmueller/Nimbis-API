@@ -1,4 +1,5 @@
 var redis = require('../').redis,
+    Group = require('./group'),
     _ = require('underscore');
 
 var base = require('./base');
@@ -39,6 +40,28 @@ User.prototype.create = function(user, fn) {
 
   // Save to database
   queue.exec(fn);
+};
+
+/*
+ * Join a group
+ *
+ * id : group id
+ * settings : stuff like color, and other user-specific settings
+ *
+ */
+User.prototype.join = function(id, settings, fn) {
+
+  // FIXME: We would need to make sure this person has permissions.
+  Group.find(id, function(err, group) {
+    if(err) return fn(err);
+    if(!group) return fn(null, false);
+
+    settings.id = id;
+    settings.name = group.name;
+
+    // Put a hash inside user:_username_ groups
+
+  });
 };
 
 /*

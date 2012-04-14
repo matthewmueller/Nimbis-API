@@ -1,5 +1,17 @@
 var Group = require('../models/group');
 
+// GET /groups
+// curl localhost:8080/groups
+exports.index = function(req, res) {
+  Group.getPublic(function(err, groups) {
+    if(err) {
+      res.send(err);
+    }
+    else {
+      res.json(groups);
+    }
+  });
+};
 
 // POST /groups
 // curl -d "name=Family&type=private&description=Family%20Time" localhost:8080/groups

@@ -69,6 +69,7 @@ var user = require('./controllers/users'),
     message = require('./controllers/messages');
 
 // Group
+app.get('/groups', group.index);
 app.post('/groups', group.create);
 app.get('/groups/:id', group.show);
 
