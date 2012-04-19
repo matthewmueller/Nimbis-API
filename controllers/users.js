@@ -10,16 +10,24 @@ exports.index = function(req, res) {
 exports.create = function(req, res) {
   var body = req.body;
 
-  User.exists(body.username, function(err, exists) {
-    if(err) res.send(err);
-    if(exists) res.send("This user already exists!");
+  var user = new User(body);
 
-    var user = new User();
-    user.create(body, function(err) {
-      if(err) res.send(err);
-      res.send('Successfully created group: ' + body.username);
-    }); 
+  user.save(function(err, model) {
+    if(err) throw err;
+
+    res.send(model);
   });
+
+  // User.exists(body.username, function(err, exists) {
+  //   if(err) res.send(err);
+  //   if(exists) res.send("This user already exists!");
+
+  //   var user = new User();
+  //   user.create(body, function(err) {
+  //     if(err) res.send(err);
+  //     res.send('Successfully created group: ' + body.username);
+  //   });
+  // });
 };
 
 // GET /users/:username

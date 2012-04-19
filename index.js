@@ -2,7 +2,7 @@
  * Module Dependencies
  */
 var express = require('express'),
-    redis = require('redis'),
+    sync = require('./support/redis.sync'),
     app = module.exports = express.createServer();
 
 /*
@@ -26,7 +26,7 @@ console.log("Server listening on port", app.address().port);
 /*
  * Connect to redis
  */
-var redis = app.redis = redis.createClient(null, null, { detect_buffers : true });
+var redis = app.redis = sync.connect(null, null, { detect_buffers : true });
 
 // Redis events
 redis.on('ready', function() {
@@ -64,19 +64,19 @@ var basicAuth = function(req, res, next) {
   }).apply(this, arguments);
 };
 
-var user = require('./controllers/users'),
-    group = require('./controllers/groups'),
-    message = require('./controllers/messages');
+var user = require('./controllers/users');
+    // group = require('./controllers/groups'),
+    // message = require('./controllers/messages');
 
 // Group
-app.get('/groups', group.index);
-app.post('/groups', group.create);
-app.get('/groups/:id', group.show);
+// app.get('/groups', group.index);
+// app.post('/groups', group.create);
+// app.get('/groups/:id', group.show);
 
 // User
 app.post('/users', user.create);
-app.get('/users/:username', user.show);
-app.post('/users/:username/join', basicAuth, user.join);
+// app.get('/users/:username', user.show);
+// app.post('/users/:username/join', basicAuth, user.join);
 
 // Messages
-app.get('/messages', message.index);
+// app.get('/messages', message.index);
