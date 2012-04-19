@@ -49,6 +49,7 @@ Base.prototype.index = function(i, key, value) {
 
 };
 
+// This isn't going to work..
 Base.prototype.savedBefore = false;
 
 Base.prototype.isNew = function() {
