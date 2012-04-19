@@ -38,15 +38,16 @@ exports.create = function(model, options, fn) {
       data = model.toJSON(),
       id  = [name, data.id].join(':');
 
-  // Queue up writes
+  // Queue the writes
   var queue = client.multi();
 
-  _.each(data, function(key, value) {
+  // Save the model
+  _.each(data, function(value, key) {
     client.hset(id, key, value);
   });
 
   // Save the indexes
-  _.each(options.indexes, function(index, attr) {
+  _.each(options.indexes, function(attr, index) {
     var key = attr[0],
         value = attr[1];
 
@@ -57,4 +58,8 @@ exports.create = function(model, options, fn) {
   queue.exec(function(err) {
     return fn(err, model);
   });
+};
+
+exports.read = function(collection, options, fn) {
+
 };
