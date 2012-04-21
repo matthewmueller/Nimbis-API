@@ -41,3 +41,16 @@ User.prototype.initialize = function() {
 
   this.set(attrs, { silent : true });
 };
+
+/*
+ * Authenticate
+ */
+User.prototype.authenticate = function(enteredPassword) {
+  var attrs = this.toJSON();
+
+  // Encrypt the entered password
+  enteredPassword = this.encrypt(attrs.salt, enteredPassword);
+
+  // Return true if authenticated, false otherwise
+  return (enteredPassword === attrs.password);
+};

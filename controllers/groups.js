@@ -3,14 +3,7 @@ var Group = require('../models/group');
 // GET /groups
 // curl localhost:8080/groups
 exports.index = function(req, res) {
-  Group.getPublic(function(err, groups) {
-    if(err) {
-      res.send(err);
-    }
-    else {
-      res.json(groups);
-    }
-  });
+  console.log(req.user);
 };
 
 // POST /groups

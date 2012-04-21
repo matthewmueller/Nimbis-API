@@ -3,7 +3,7 @@
  */
 var express = require('express'),
     sync = require('./support/redis.sync'),
-    app = module.exports = express.createServer();
+    app = module.exports = express();
 
 /*
  * Configure
@@ -21,7 +21,7 @@ var env = app.env = process.env.NODE_ENV || 'development';
  * Listen
  */
 app.listen(8080);
-console.log("Server listening on port", app.address().port);
+console.log("Server listening on port 8080");
 
 /*
  * Connect to redis
@@ -57,26 +57,47 @@ redis.on('error', function() {
  *
  */
 
+/*
+ * Basic authentication
+ *
+ * Kind of messy - will probably need to be refactored
+ */
 var basicAuth = function(req, res, next) {
   var User = require('./models/user');
   express.basicAuth(function(user, pass, fn) {
-    User.authenticate(user, pass, fn);
+    user = new User({ username : user });
+
+    user.fetch(function(err, user) {
+      if(err) return fn(err);
+      
+      if(user.authenticate(pass)) {
+        return fn(null, user.toJSON());
+      } else {
+        return fn(null, false);
+      }
+
+    });
+
   }).apply(this, arguments);
 };
 
-var user = require('./controllers/users');
-    // group = require('./controllers/groups'),
+/*
+ * Controllers
+ */
+var user = require('./controllers/users'),
+    group = require('./controllers/groups');
     // message = require('./controllers/messages');
 
 // Group
-// app.get('/groups', group.index);
+app.get('/groups', basicAuth, group.index);
 // app.post('/groups', group.create);
 // app.get('/groups/:id', group.show);
 
 // User
 app.post('/users', user.create);
 app.get('/users/:username', user.show);
-// app.post('/users/:username/join', basicAuth, user.join);
+
+// app.post('/join', basicAuth, user.join);
 
 // Messages
 // app.get('/messages', message.index);
