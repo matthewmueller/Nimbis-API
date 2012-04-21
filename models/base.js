@@ -1,5 +1,4 @@
 var crypto = require('crypto'),
-    redis = require('redis'),
     _ = require('underscore'),
     redisSync = require('../support/redis.sync'),
     Backbone = require('Backbone');
