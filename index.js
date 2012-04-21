@@ -75,7 +75,7 @@ var user = require('./controllers/users');
 
 // User
 app.post('/users', user.create);
-// app.get('/users/:username', user.show);
+app.get('/users/:username', user.show);
 // app.post('/users/:username/join', basicAuth, user.join);
 
 // Messages

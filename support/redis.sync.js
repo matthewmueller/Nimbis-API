@@ -33,33 +33,44 @@ exports.connect = function() {
   return client;
 };
 
-exports.create = function(model, options, fn) {
-  var name = model.name.toLowerCase(),
-      data = model.toJSON(),
-      id  = [name, data.id].join(':');
+exports.create = function(ds, options, fn) {
+  var name = ds.name.toLowerCase(),
+      data = ds.toJSON(),
+      key  = [name, data.id].join(':');
 
   // Queue the writes
   var queue = client.multi();
 
-  // Save the model
-  _.each(data, function(value, key) {
-    client.hset(id, key, value);
+  // Save the backbone model/collection
+  _.each(data, function(value, attr) {
+    queue.hset(key, attr, value);
   });
 
   // Save the indexes
   _.each(options.indexes, function(attr, index) {
-    var key = attr[0],
-        value = attr[1];
-
-    client.hset(index, key, value);
+    
+    // key : attr[0], value : attr[1]
+    queue.hset(index, attr[0], attr[1]);
+  
   });
 
   // Save to database
   queue.exec(function(err) {
-    return fn(err, model);
+    return fn(err, ds);
   });
 };
 
-exports.read = function(collection, options, fn) {
+exports.read = function(ds, options, fn) {
+  var name = ds.name.toLowerCase(),
+      data = ds.toJSON(),
+      key  = [name, data.id].join(':');
 
+  client.hgetall(key, function(err, data) {
+    if(err) return fn(err);
+
+    // Add in the data
+    ds.set(data, { silent : true });
+    
+    return fn(null, ds);
+  });
 };

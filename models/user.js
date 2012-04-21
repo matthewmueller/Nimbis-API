@@ -20,14 +20,21 @@ User.prototype.access = {
  * Initialize a new user
  */
 User.prototype.initialize = function() {
-  var attrs = this.toJSON(),
-      salt = this.makeSalt();
+  var attrs = this.toJSON();
 
-  attrs.password = this.encrypt(salt, attrs.password);
-  attrs.salt = salt;
+  // Make all usernames lowercase
+  attrs.username = attrs.username.toLowerCase();
 
   // Right now have the id be the username
   attrs.id = attrs.username;
+
+  // Encrypt the password if given
+  if(attrs.password) {
+    var salt = this.makeSalt();
+
+    attrs.password = this.encrypt(salt, attrs.password);
+    attrs.salt = salt;
+  }
 
   // Set up the index
   this.index('email:username', attrs.email, attrs.username);

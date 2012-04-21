@@ -1,12 +1,16 @@
 var crypto = require('crypto'),
     _ = require('underscore'),
-    redisSync = require('../support/redis.sync'),
     Backbone = require('Backbone');
 
 /*
  * Extend Backbone
  */
 var Base = module.exports = Backbone.Model.extend({});
+
+/*
+ * Sync with redis
+ */
+Base.prototype.sync = require('../support/redis.sync');
 
 /*
  * Indexes
@@ -45,10 +49,9 @@ Base.prototype.index = function(i, key, value) {
 
   // Add as an array. Ex. i:email:username = ['mattmuelle@gmail.com', 'matt'];
   this.indexes[i] = [key, value];
-
 };
 
-// This isn't going to work..
+// This isn't going to work.. use timestamp instead. ie. lastUpdated
 Base.prototype.savedBefore = false;
 
 Base.prototype.isNew = function() {
@@ -74,6 +77,17 @@ Base.prototype.save = function(options, fn) {
 };
 
 /*
- * Sync with redis
+ * Fetch a particular model
  */
-Base.prototype.sync = redisSync;
+var _fetch = Base.prototype.fetch;
+Base.prototype.fetch = function(options, fn) {
+  if(_.isFunction(options)) fn = options;
+
+  // Pass the callback through to sync
+  options._callback = fn;
+
+  _fetch.call(this, options);
+};
+
+
+

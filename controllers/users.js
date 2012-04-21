@@ -35,10 +35,11 @@ exports.create = function(req, res) {
 exports.show = function(req, res) {
   var params = req.params;
 
-  User.find(params.username, function(err, user) {
-    if(err) res.send(err);
-    else if(!user) res.send('Couldn\'t find user');
+  var user = new User({ username : params.username });
 
-    res.json(user);
+  user.fetch(function(err, model) {
+    if(err) throw err;
+
+    res.send(model.toJSON());
   });
 };
