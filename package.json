@@ -6,7 +6,7 @@
   "version": "0.0.0",
   "main": "index.js",
   "dependencies": {
-    "express" : "*",
+    "express" : "3.x",
     "backbone" : "*",
     "passport" : "*",
     "redis" : "*",
