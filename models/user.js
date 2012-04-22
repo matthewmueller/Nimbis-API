@@ -17,7 +17,7 @@ User.prototype.access = {
 };
 
 /*
- * Initialize a new user
+ * Initialize a user model
  */
 User.prototype.initialize = function() {
   var attrs = this.toJSON();

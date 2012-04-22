@@ -56,6 +56,22 @@ redis.on('error', function() {
  * DELETE  /:id              ->  destroy
  *
  */
+var User = require('./models/user');
+
+var loadUser = function(username, password, fn) {
+  user = new User({ username : username });
+
+  user.fetch(function(err, user) {
+    if(err) return fn(err);
+    
+    if(user.authenticate(password)) {
+      return fn(null, user.toJSON());
+    } else {
+      return fn(null, false);
+    }
+
+  });
+};
 
 /*
  * Basic authentication
@@ -63,21 +79,8 @@ redis.on('error', function() {
  * Kind of messy - will probably need to be refactored
  */
 var basicAuth = function(req, res, next) {
-  var User = require('./models/user');
   express.basicAuth(function(user, pass, fn) {
-    user = new User({ username : user });
-
-    user.fetch(function(err, user) {
-      if(err) return fn(err);
-      
-      if(user.authenticate(pass)) {
-        return fn(null, user.toJSON());
-      } else {
-        return fn(null, false);
-      }
-
-    });
-
+    loadUser(user, pass, fn);
   }).apply(this, arguments);
 };
 
@@ -89,9 +92,8 @@ var user = require('./controllers/users'),
     // message = require('./controllers/messages');
 
 // Group
-app.get('/groups', basicAuth, group.index);
-// app.post('/groups', group.create);
-// app.get('/groups/:id', group.show);
+app.post('/groups', basicAuth, group.create);
+app.get('/groups/:id', group.show);
 
 // User
 app.post('/users', user.create);
