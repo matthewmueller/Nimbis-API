@@ -102,4 +102,5 @@ app.get('/users/:username', user.show);
 // app.post('/join', basicAuth, user.join);
 
 // Messages
-// app.get('/messages', message.index);
+app.post('/messages', basicAuth, message.create);
+app.get('/messages', basicAuth, message.index);
