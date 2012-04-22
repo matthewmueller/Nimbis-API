@@ -33,16 +33,29 @@ exports.connect = function() {
   return client;
 };
 
+/*
+ * Create an entry
+ */
 exports.create = function(ds, options, fn) {
   var name = ds.name.toLowerCase(),
       data = ds.toJSON(),
-      key  = [name, data.id].join(':');
+      types = ds.types || {},
+      key  = [name, data.id].join(':'),
+      type;
 
   // Queue the writes
   var queue = client.multi();
 
   // Save the backbone model/collection
   _.each(data, function(value, attr) {
+    type = types[attr];
+    type = (type && type.name) ? type.name : 'String';
+
+    // Stringify if we're working with a Object or Array
+    if(type === 'Object' || type === 'Array') {
+      value = JSON.stringify(value);
+    }
+
     queue.hset(key, attr, value);
   });
 
@@ -60,13 +73,29 @@ exports.create = function(ds, options, fn) {
   });
 };
 
+/*
+ * Read an entry
+ */
 exports.read = function(ds, options, fn) {
   var name = ds.name.toLowerCase(),
       data = ds.toJSON(),
+      types = ds.types || {},
       key  = [name, data.id].join(':');
 
   client.hgetall(key, function(err, data) {
     if(err) return fn(err);
+    if(_.isEmpty(data)) return fn(null, false);
+
+    // Return proper types
+    _.each(data, function(value, attr) {
+      type = types[attr];
+      type = (type && type.name) ? type.name : 'String';
+
+      // Parse if we're working with a Object or Array
+      if(type === 'Object' || type === 'Array') {
+        data[attr] = JSON.parse(value);
+      }
+    });
 
     // Add in the data
     ds.set(data, { silent : true });

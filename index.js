@@ -65,7 +65,7 @@ var loadUser = function(username, password, fn) {
     if(err) return fn(err);
     
     if(user.authenticate(password)) {
-      return fn(null, user.toJSON());
+      return fn(null, user);
     } else {
       return fn(null, false);
     }
@@ -89,7 +89,7 @@ var basicAuth = function(req, res, next) {
  */
 var user = require('./controllers/users'),
     group = require('./controllers/groups');
-    // message = require('./controllers/messages');
+    message = require('./controllers/messages');
 
 // Group
 app.post('/groups', basicAuth, group.create);
@@ -98,8 +98,7 @@ app.get('/groups/:id', group.show);
 // User
 app.post('/users', user.create);
 app.get('/users/:username', user.show);
-
-// app.post('/join', basicAuth, user.join);
+app.post('/join', basicAuth, user.join);
 
 // Messages
 app.post('/messages', basicAuth, message.create);

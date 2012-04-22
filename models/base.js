@@ -58,6 +58,23 @@ Base.prototype.isNew = function() {
   return !this.savedBefore;
 };
 
+/*
+ * Validate Types
+ */
+Base.validateTypes = function() {
+  _.each(this.types, function(type, attr) {
+    // _.isNumber, _.isString, etc.
+    if(!_['is' + type.name](attr)) {
+      return new Error(attr + ' is not a ' + type.name);
+    }
+  });
+
+  return null;
+};
+
+/*
+ * Save a model
+ */
 var _save = Base.prototype.save;
 Base.prototype.save = function(options, fn) {
   if(_.isFunction(options)) fn = options;

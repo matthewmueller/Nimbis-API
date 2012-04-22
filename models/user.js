@@ -17,6 +17,26 @@ User.prototype.access = {
 };
 
 /*
+ * Types
+ */
+User.prototype.types = {
+  id : String,
+  name : String,
+  username : String,
+  email : String,
+  password : String,
+  groups : Array,
+  salt : String
+};
+
+/*
+ * Defaults
+ */
+User.prototype.defaults = {
+  groups : []
+};
+
+/*
  * Initialize a user model
  */
 User.prototype.initialize = function() {
@@ -28,8 +48,8 @@ User.prototype.initialize = function() {
   // Right now have the id be the username
   attrs.id = attrs.username;
 
-  // Encrypt the password if given
-  if(attrs.password) {
+  // Encrypt the password if given and we haven't already encrypted it.
+  if(!attrs.salt && attrs.password) {
     var salt = this.makeSalt();
 
     attrs.password = this.encrypt(salt, attrs.password);
