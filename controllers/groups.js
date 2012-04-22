@@ -2,8 +2,13 @@ var Group = require('../models/group');
 
 // GET /groups
 // curl localhost:8080/groups
+// TODO: Should get all the information about the groups I'm in
 exports.index = function(req, res) {
-  console.log(req.user);
+  var user = req.user,
+      groups = user.get('groups');
+
+  res.send(groups);
+
 };
 
 // POST /groups

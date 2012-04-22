@@ -92,6 +92,7 @@ var user = require('./controllers/users'),
     message = require('./controllers/messages');
 
 // Group
+app.get('/groups', basicAuth, group.index);
 app.post('/groups', basicAuth, group.create);
 app.get('/groups/:id', group.show);
 
