@@ -32,14 +32,11 @@ Message.prototype.initialize = function() {
 
   attrs.id = attrs.id || this.makeId(6);
 
-  if(attrs.groups)
-    console.log('groups', attrs.groups);
-
   this.set(attrs, { silent : true });
 };
 
 /*
- * Save the message in group lists
+ * Extend save to add messages to group lists
  */
 Message.prototype.save = function(options, fn) {
   if(!redis.connected) fn(new Error('Redis not connected'));
