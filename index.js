@@ -2,7 +2,7 @@
  * Module Dependencies
  */
 var express = require('express'),
-    sync = require('./support/redis.sync'),
+    redis = require('redis'),
     app = module.exports = express();
 
 /*
@@ -26,7 +26,7 @@ console.log("Server listening on port 8080");
 /*
  * Connect to redis
  */
-var redis = app.redis = sync.connect(null, null, { detect_buffers : true });
+var redis = app.redis = redis.createClient(null, null, { detect_buffers : true });
 
 // Redis events
 redis.on('ready', function() {

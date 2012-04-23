@@ -1,7 +1,5 @@
-var redis = require('redis'),
-    _ = require('underscore'),
-    isConnected = false,
-    client = null;
+var _ = require('underscore'),
+    redis = require('../').redis;
 
 exports = module.exports = function(method, model, options) {
   // Yank out the callback
@@ -9,7 +7,7 @@ exports = module.exports = function(method, model, options) {
   delete options._callback;
 
   // If we're not connected error out.
-  if(!isConnected) return callback(new Error('Redis not ready'));
+  if(!redis.connected) return callback(new Error('Redis not ready'));
 
   // Delete unused options that backbone added
   delete options.success;
@@ -17,20 +15,6 @@ exports = module.exports = function(method, model, options) {
 
   // Call a method based on the type of save
   exports[method](model, options, callback);
-};
-
-exports.connect = function() {
-  client = redis.createClient.apply(this, arguments);
-
-  client.on('ready', function() {
-    isConnected = true;
-  });
-
-  client.on('end', function() {
-    isConnected = false;
-  });
-
-  return client;
 };
 
 /*
@@ -44,7 +28,7 @@ exports.create = function(ds, options, fn) {
       type;
 
   // Queue the writes
-  var queue = client.multi();
+  var queue = redis.multi();
 
   // Save the backbone model/collection
   _.each(data, function(value, attr) {
@@ -82,7 +66,7 @@ exports.read = function(ds, options, fn) {
       types = ds.types || {},
       key  = [name, data.id].join(':');
 
-  client.hgetall(key, function(err, data) {
+  redis.hgetall(key, function(err, data) {
     if(err) return fn(err);
     if(_.isEmpty(data)) return fn(null, false);
 
