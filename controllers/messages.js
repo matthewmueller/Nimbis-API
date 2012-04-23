@@ -2,7 +2,11 @@ var Message = require('../models/message');
 
 // GET /messages
 // curl localhost:8080/messages
+// This will get messages available to specific user
 exports.index = function(req, res) {
+  var user = req.user.toJSON();
+
+  console.log('groups', user.groups);
 
 };
 
@@ -19,11 +23,9 @@ exports.create = function(req, res) {
     id : user.id,
     name : user.name
   };
-  console.log(req.user.indexes);
+
   // Create a new message
   var message = new Message(body);
-
-  console.log(message.indexes);
 
   message.save(function(err, model) {
     if(err) throw err;

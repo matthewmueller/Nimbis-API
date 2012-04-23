@@ -4,7 +4,7 @@ var Base = require('./base'),
 /*
  * Extend the base model
  */
-var Message = module.exports = _.extend(Base, {});
+var Message = module.exports = Base.extend();
 
 /*
  * Types
@@ -28,6 +28,8 @@ Message.prototype.initialize = function() {
   var attrs = this.toJSON();
 
   attrs.id = attrs.id || this.makeId(6);
+
+  if(attrs.groups)
 
   this.set(attrs, { silent : true });
 };

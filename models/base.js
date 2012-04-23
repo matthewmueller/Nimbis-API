@@ -5,7 +5,7 @@ var crypto = require('crypto'),
 /*
  * Extend Backbone
  */
-var Base = module.exports = Backbone.Model.extend({});
+var Base = module.exports = Backbone.Model.extend();
 
 /*
  * Sync with redis
