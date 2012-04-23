@@ -57,7 +57,9 @@ User.prototype.initialize = function() {
   }
 
   // Set up the index
-  this.index('email:username', attrs.email, attrs.username);
+  if(attrs.email && attrs.username) {
+    this.index('email:username', attrs.email, attrs.username);
+  }
 
   this.set(attrs, { silent : true });
 };

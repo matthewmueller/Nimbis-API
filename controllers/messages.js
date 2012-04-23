@@ -19,11 +19,11 @@ exports.create = function(req, res) {
     id : user.id,
     name : user.name
   };
-
+  console.log(req.user.indexes);
   // Create a new message
   var message = new Message(body);
 
-  console.log(message.test);
+  console.log(message.indexes);
 
   message.save(function(err, model) {
     if(err) throw err;

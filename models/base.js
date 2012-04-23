@@ -13,11 +13,6 @@ var Base = module.exports = Backbone.Model.extend({});
 Base.prototype.sync = require('../support/redis.sync');
 
 /*
- * Indexes
- */
-Base.prototype.indexes = {};
-
-/*
  * Public: Generate Salt
  */
 Base.prototype.makeSalt = function() {
@@ -82,7 +77,7 @@ Base.prototype.save = function(options, fn) {
   options = (options) ? _.clone(options) : {};
 
   // Add in the indexes
-  options.indexes = this.indexes;
+  options.indexes = this.indexes || {};
 
   // Pass the callback through to sync
   options._callback = function(err, model) {
