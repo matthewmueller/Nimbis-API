@@ -31,10 +31,13 @@ Group.getMessagesById = function(groupID, options, fn) {
   // Number of messages to return
   options.limit = options.limit || 50;
 
+  // Offset
+  options.offset = options.offset || 0;
+
   // List
   var list = 'l:group:' + groupID + ':messages';
 
   // Run the redis query
-  redis.lrange(list, 0, options.limit, fn);
+  redis.lrange(list, options.offset, options.limit, fn);
 
 };
