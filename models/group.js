@@ -1,5 +1,5 @@
-var Backbone = require('Backbone'),
-    Base = require('./base');
+var Base = require('./base'),
+    redis = require('../').redis;
 
 var Group = module.exports = Base.extend();
 
@@ -20,4 +20,21 @@ Group.prototype.initialize = function() {
   this.index('group:id', attrs.name, attrs.id);
 
   this.set(attrs, { silent : true });
+};
+
+/*
+ * Static: Get messages by group
+ */
+Group.getMessagesById = function(groupID, options, fn) {
+  option = options || {};
+
+  // Number of messages to return
+  options.limit = options.limit || 50;
+
+  // List
+  var list = 'l:group:' + groupID + ':messages';
+
+  // Run the redis query
+  redis.lrange(list, 0, options.limit, fn);
+
 };
