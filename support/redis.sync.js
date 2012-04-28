@@ -1,5 +1,6 @@
 var _ = require('underscore'),
     Hash = require('../structures/hash'),
+    after = require('./utils').after,
     isObject = _.isObject,
     isArray  = Array.isArray,
     stringify = JSON.stringify,
@@ -41,28 +42,38 @@ exports.create = function(ds, options, fn) {
   hash.set(data, fn);
 };
 
-
-
 /*
- * Read an entry
+ * Read an entry or two
  */
 exports.read = function(ds, options, fn) {
-  var name = ds.name.toLowerCase(),
-      data = ds.toJSON(),
-      key  = [name, data.id].join(':');
+  // convert everything into an array
+  var models = (ds.models) ? ds.models : [ds],
+      finished = after(models.length),
+      json = [],
+      hash = new Hash();
 
-  var hash = new Hash(key);
-  hash.get(function(err, data) {
-    if(err) return fn(err);
-    else if(_.isEmpty(data)) return fn(null, false);
+  function done() {
+    // If its a model, use set, if collection use reset
+    (ds.set) ? ds.set(json) : ds.reset(json);
+    return fn();
+  } 
 
-    // Recursive JSON.parse
-    data = parse(stringify(data));
+  _(models).each(function(model) {
+    var name = model.name.toLowerCase(),
+        key  = [name, model.id].join(':');
 
-    // Set the data
-    ds.set(data);
+    // Update the hash key
+    hash.key = key;
+    
+    hash.get(function(err, data) {
+      if(err) return fn(err);
+      else if(_.isEmpty(data)) return fn(null, false);
 
-    return fn(null, data);
+      // Recursive JSON.parse
+      json.push(parse(stringify(data)));
 
-  });
+      if(finished()) return done();
+    });
+
+  }); 
 };

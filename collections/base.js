@@ -14,20 +14,19 @@ Base.prototype.sync = require('../support/redis.sync');
 /*
  * Fetch a collection
  */
-var _fetch = Base.prototype.fetch;
 Base.prototype.fetch = function(options, fn) {
   if(_.isFunction(options)) fn = options;
 
-  // Sync the model with the database
-  this.sync('read', options, function(err, model) {
+  // Sync the collection with the database
+  this.sync('read', options, function(err, collection) {
 
     // Call hooks if available
-    if(err && model.onError) {
-      model.onError.call(model, err, fn);
-    } else if(!err && model.onFetch) {
-      model.onFetch.call(model, model, fn);
+    if(err && collection.onError) {
+      collection.onError.call(collection, err, fn);
+    } else if(!err && collection.onFetch) {
+      collection.onFetch.call(collection, collection, fn);
     } else {
-      fn(err, model);
+      fn(err, collection);
     }
 
   });
