@@ -15,13 +15,6 @@ Group.prototype.name = 'group';
  */
 Group.prototype.requires = ['name', 'type'];
 
-/*
- * Default values
- */
-Group.prototype.defaults = {
-  type : 'public'
-};
-
 /* 
  * Types of the attributes
  */
@@ -30,6 +23,13 @@ Group.prototype.types = {
   name : String,
   description : String,
   type : String
+};
+
+/*
+ * Default values
+ */
+Group.prototype.defaults = {
+  type : 'public'
 };
 
 /*
@@ -42,24 +42,3 @@ Group.prototype.initialize = function() {
 
   this.set(attrs, { silent : true });
 };
-
-
-/*
- * Static: Get messages by group
- */
-// Group.getMessagesById = function(groupID, options, fn) {
-//   option = options || {};
-
-//   // Number of messages to return
-//   options.limit = options.limit || 50;
-
-//   // Offset
-//   options.offset = options.offset || 0;
-
-//   // List
-//   var list = 'l:group:' + groupID + ':messages';
-
-//   // Run the redis query
-//   redis.lrange(list, options.offset, options.limit, fn);
-
-// };
