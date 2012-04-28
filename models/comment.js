@@ -48,3 +48,11 @@ Comment.prototype.onSave = function(model, fn) {
   });
 
 };
+
+// Static Properties
+// -----------------
+
+Comment.find = function(id, fn) {
+  var comment = new Comment({ id : id });
+  comment.fetch(fn);
+};

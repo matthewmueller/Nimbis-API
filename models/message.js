@@ -64,3 +64,11 @@ Message.prototype.onSave = function(model, fn) {
   });
 
 };
+
+// Static Properties
+// -----------------
+
+Message.find = function(id, fn) {
+  var message = new Message({ id : id });
+  message.fetch(fn);
+};

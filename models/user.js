@@ -124,6 +124,11 @@ User.prototype.authenticate = function(enteredPassword) {
 // Static Properties
 // -----------------
 
+User.find = function(id, fn) {
+  var user = new User({ id : id });
+  user.fetch(fn);
+};
+
 User.exists = function(val, fn) {
   var rEmail = /^[+a-zA-Z0-9_.-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,6}$/,
       index = new Index();

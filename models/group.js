@@ -42,3 +42,11 @@ Group.prototype.initialize = function() {
 
   this.set(attrs, { silent : true });
 };
+
+// Static Properties
+// -----------------
+
+Group.find = function(id, fn) {
+  var group = new Group({ id : id });
+  group.fetch(fn);
+};

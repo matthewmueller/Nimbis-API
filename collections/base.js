@@ -18,8 +18,17 @@ var _fetch = Base.prototype.fetch;
 Base.prototype.fetch = function(options, fn) {
   if(_.isFunction(options)) fn = options;
 
-  // Pass the callback through to sync
-  options._callback = fn;
+  // Sync the model with the database
+  this.sync('read', options, function(err, model) {
 
-  _fetch.call(this, options);
+    // Call hooks if available
+    if(err && model.onError) {
+      model.onError.call(model, err, fn);
+    } else if(!err && model.onFetch) {
+      model.onFetch.call(model, model, fn);
+    } else {
+      fn(err, model);
+    }
+
+  });
 };
