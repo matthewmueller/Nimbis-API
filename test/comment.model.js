@@ -1,5 +1,6 @@
 var expect = require('expect.js'),
     Comment = require('../models/comment'),
+    List = require('../structures/list'),
     client = require('../support/client');
 
 // Default user options
@@ -31,6 +32,7 @@ describe('Comment Model', function() {
     it('should create an empty new comment', function(done) {
       comment = new Comment(attrs);
       expect(comment.get('id')).to.be.ok();
+      expect(comment.get('id')).to.have.length(12);
       expect(comment.get('messageId')).to.be('abc123');
       return done();
     });
@@ -42,8 +44,21 @@ describe('Comment Model', function() {
       comment.save(function(err, model) {
         if(err) return done(err);
         expect(model.get('comment')).to.be('Cool story bro');
-        expect(model.get('created_at')).to.be.a(Date);        
+        expect(model.get('created_at')).to.be.a(Date);
         done();
+      });
+    });
+
+    it('should create a list of comments per messageId', function(done) {
+      var list = new List();
+      comment.save(function(err, model) {
+        if(err) return done(err);
+        var messageId = model.get('messageId');
+        list.key = 'list:message:'+ messageId +':comments';
+        list.get(0, function(err, comment) {
+          expect(comment).to.be(model.id);
+          done();
+        });
       });
     });
   });
