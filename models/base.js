@@ -33,19 +33,6 @@ Base.prototype.makeId = function(len) {
   return Math.random().toString(36).substr(2,len);
 };
 
-/*
- * Index an attribute
- */
-Base.prototype.index = function(i, key, value) {
-  this.indexes = (this.indexes) ? this.indexes : {};
-
-  // Prepend with i:
-  i = 'i:' + i;
-
-  // Add as an array. Ex. i:email:username = ['mattmuelle@gmail.com', 'matt'];
-  this.indexes[i] = [key, value];
-};
-
 Base.prototype.isNew = function() {
   return !this.attributes.created_at;
 };
@@ -53,15 +40,41 @@ Base.prototype.isNew = function() {
 /*
  * Validate Types
  */
-Base.validateTypes = function() {
-  _.each(this.types, function(type, attr) {
-    // _.isNumber, _.isString, etc.
-    if(!_['is' + type.name](attr)) {
-      return new Error(attr + ' is not a ' + type.name);
+Base.prototype.checkTypes = function(types) {
+  var model = this;
+
+  _.each(types, function(type, attr) {
+    // console.log(attr, type.name);
+    // console.log(model.toJSON());
+    attr = model.get(attr);
+    if(!(attr instanceof type)) {
+      console.log('error');
+      return new Error('Invalid attribute: ' + attr + ' expected to be ' + type.name);
     }
   });
 
-  return null;
+  // No problems
+  return false;
+};
+
+var _validate = Base.prototype._validate;
+Base.prototype._validate = function(attrs, options) {
+  options = options || {};
+
+  var error = false; //this.checkTypes(this.types || {});
+  if (!error) return _validate.call(this, attrs, options);
+
+  if (options && options.error) {
+    options.error(this, error, options);
+  } else {
+    this.trigger('error', this, error, options);
+  }
+
+  return false;
+}
+
+Base.prototype.isValid = function() {
+  return !!this._validate();
 };
 
 /*
