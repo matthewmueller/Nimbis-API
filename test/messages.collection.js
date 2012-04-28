@@ -2,7 +2,7 @@ var expect = require('expect.js'),
     Messages = require('../collections/messages'),
     client = require('../support/client');
 
-var messages = [
+var collection = [
   {
     message : 'Hi world!',
     groups : ['abc123', '123abc'],
@@ -32,15 +32,20 @@ describe('Messages Collection', function() {
 
   // Run before each
   beforeEach(function() {
-    messages = new Messages(attrs);
+    messages = new Messages(collection);
   });
 
   // #initialize()
   describe('#initialize()', function() {
     it('should create a new message collection', function(done) {
-      messages = new Messages(attrs);
+      messages = new Messages(collection);
 
-      console.log(messages);
+      var msgs = messages.pluck('message'),
+          ids = messages.pluck('id');
+
+      expect(ids[0]).to.be.ok();
+      expect(msgs[1]).to.be('Hi back!');
+      expect(ids[1]).to.be.ok();
       return done();
     });
   });
