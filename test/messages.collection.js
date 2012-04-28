@@ -90,16 +90,18 @@ describe('Messages Collection', function() {
     });
   };
 
-  // describe('#save()', function() {
-  //   it('should save a new message', function(done) {
-  //     messages.save(function(err, collection) {
-  //       if(err) return done(err);
-  //       console.log(collection);
-  //       // expect(model.get('message')).to.be('Hi world!');
-  //       // expect(model.get('created_at')).to.be.a(Date);        
-  //       done();
-  //     });
-  //   });
-  // });
+  describe('#save()', function() {
+    it('should save a new message', function(done) {
+      messages.save(function(err, collection) {
+        if(err) return done(err);
+        
+        collection.each(function(message) {
+          expect(message.get('created_at')).to.be.a(Date);
+        });
+
+        done();
+      });
+    });
+  });
 
 });
