@@ -105,7 +105,18 @@ Base.prototype.save = function(options, fn) {
  */
 Base.prototype.fetch = function(options, fn) {
   if(_.isFunction(options)) fn = options;
-  this.sync('read', options, fn)
+
+  this.sync('read', options, function(err, model) {
+
+    // Call hooks if available
+    if(err && model.onError) {
+      model.onError.call(model, err, fn);
+    } else if(!err && model.onFetch) {
+      model.onFetch.call(model, model, fn);
+    } else {
+      fn(err, model);
+    }
+  });
 };
 
 
