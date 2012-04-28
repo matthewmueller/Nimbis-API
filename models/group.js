@@ -1,5 +1,5 @@
 var Base = require('./base'),
-    redis = require('../').redis;
+    redis = require('../support/client');
 
 var Group = module.exports = Base.extend();
 

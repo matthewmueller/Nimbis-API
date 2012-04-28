@@ -14,7 +14,8 @@
     "validator" : "*"
   },
   "devDependencies": {
-    "request" : "*"
+    "mocha" : "*",
+    "expect.js" : "*"
   },
   "optionalDependencies": {},
   "engines": {

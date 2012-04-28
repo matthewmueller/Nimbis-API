@@ -23,7 +23,7 @@ var client = require('../').redis;
  *    `(namespace:)key = list(values)`
  */
 
-var List = exports.List = function(key) {
+var List = module.exports = function(key) {
     this.key = key;
 };
 

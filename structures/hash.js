@@ -8,7 +8,7 @@
  * Module dependencies.
  */
 
-var client = require('../').redis;
+var client = require('../support/client');
 
 /**
  * A wrapper for the Redis hash type.
@@ -23,7 +23,7 @@ var client = require('../').redis;
  *    `(namespace:)key = hash(key => value)`
  */
 
-var Hash = exports.Hash = function(key) {
+var Hash = module.exports = function(key) {
   this.key = key;
 };
 

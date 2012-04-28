@@ -46,11 +46,8 @@ Base.prototype.index = function(i, key, value) {
   this.indexes[i] = [key, value];
 };
 
-// This isn't going to work.. use timestamp instead. ie. lastUpdated
-Base.prototype.savedBefore = false;
-
 Base.prototype.isNew = function() {
-  return !this.savedBefore;
+  return !this.attributes.created_at;
 };
 
 /*
@@ -70,35 +67,45 @@ Base.validateTypes = function() {
 /*
  * Save a model
  */
-var _save = Base.prototype.save;
 Base.prototype.save = function(options, fn) {
-  if(_.isFunction(options)) fn = options;
-  
-  options = (options) ? _.clone(options) : {};
+  var date = new Date(),
+      method = 'update';
 
-  // Add in the indexes
-  options.indexes = this.indexes || {};
+  // Add timestamps
+  if(this.isNew()) {
+    method = 'create';
+    this.set('created_at', date, { silent : true });
+  }
 
-  // Pass the callback through to sync
-  options._callback = function(err, model) {
-    if(!err) this.savedBefore = true;
-    return fn(err, model);
-  };
+  this.set('modified_at', date, { silent : true });
 
-  _save.call(this, {}, options);
+  if(_.isFunction(options)) {
+    fn = options;
+    options = {};
+  } else {
+    options = _.clone(options);
+  }
+
+  this.sync(method, options, function(err, model) {
+    
+    // Call hooks if available
+    if(err && model.onError) {
+      model.onError.call(model, err, fn);
+    } else if(!err && model.onSave) {
+      model.onSave.call(model, model, fn);
+    } else {
+      fn(err, model);
+    }
+
+  });
 };
 
 /*
  * Fetch a particular model
  */
-var _fetch = Base.prototype.fetch;
 Base.prototype.fetch = function(options, fn) {
   if(_.isFunction(options)) fn = options;
-
-  // Pass the callback through to sync
-  options._callback = fn;
-
-  _fetch.call(this, options);
+  this.sync('read', options, fn)
 };
 
 

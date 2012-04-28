@@ -1,20 +1,20 @@
 var _ = require('underscore'),
-    redis = require('../').redis;
+    Hash = require('../structures/hash'),
+    isObject = _.isObject,
+    isArray  = Array.isArray,
+    stringify = JSON.stringify,
+    parse = JSON.parse;
 
-exports = module.exports = function(method, model, options) {
-  // Yank out the callback
-  var callback = options._callback;
-  delete options._callback;
+exports = module.exports = function(method, options, fn) {
+  options = options || {};
 
-  // If we're not connected error out.
-  if(!redis.connected) return callback(new Error('Redis not ready'));
-
-  // Delete unused options that backbone added
-  delete options.success;
-  delete options.error;
+  var datastore = this;
 
   // Call a method based on the type of save
-  exports[method](model, options, callback);
+  exports[method](datastore, options, function(err) {
+    if(err) return fn(err);
+    return fn(null, datastore);
+  });
 };
 
 /*
@@ -23,39 +23,25 @@ exports = module.exports = function(method, model, options) {
 exports.create = function(ds, options, fn) {
   var name = ds.name.toLowerCase(),
       data = ds.toJSON(),
-      types = ds.types || {},
-      key  = [name, data.id].join(':'),
-      type;
+      key  = [name, data.id].join(':');
 
-  // Queue the writes
-  var queue = redis.multi();
+  // Create a new hash
+  var hash = new Hash(key);
 
-  // Save the backbone model/collection
+  // Any objects 2 levels deep, stringify
   _.each(data, function(value, attr) {
-    type = types[attr];
-    type = (type && type.name) ? type.name : 'String';
 
-    // Stringify if we're working with a Object or Array
-    if(type === 'Object' || type === 'Array') {
-      value = JSON.stringify(value);
+    if(isArray(value) || isObject(value)) {
+      data[attr] = stringify(value);
     }
 
-    queue.hset(key, attr, value);
   });
 
-  // Save the indexes
-  _.each(options.indexes, function(attr, index) {
-    
-    // key : attr[0], value : attr[1]
-    queue.hset(index, attr[0], attr[1]);
-  
-  });
-
-  // Save to database
-  queue.exec(function(err) {
-    return fn(err, ds);
-  });
+  // Save the hash
+  hash.set(data, fn);
 };
+
+
 
 /*
  * Read an entry
@@ -63,27 +49,20 @@ exports.create = function(ds, options, fn) {
 exports.read = function(ds, options, fn) {
   var name = ds.name.toLowerCase(),
       data = ds.toJSON(),
-      types = ds.types || {},
       key  = [name, data.id].join(':');
 
-  redis.hgetall(key, function(err, data) {
+  var hash = new Hash(key);
+  hash.get(function(err, data) {
     if(err) return fn(err);
-    if(_.isEmpty(data)) return fn(null, false);
+    else if(_.isEmpty(data)) return fn(null, false);
 
-    // Return proper types
-    _.each(data, function(value, attr) {
-      type = types[attr];
-      type = (type && type.name) ? type.name : 'String';
+    // Recursive JSON.parse
+    data = parse(stringify(data));
 
-      // Parse if we're working with a Object or Array
-      if(type === 'Object' || type === 'Array') {
-        data[attr] = JSON.parse(value);
-      }
-    });
+    // Set the data
+    ds.set(data);
 
-    // Add in the data
-    ds.set(data, { silent : true });
-    
-    return fn(null, ds);
+    return fn(null, data);
+
   });
 };

@@ -1,5 +1,6 @@
 var Backbone = require('Backbone'),
-    Base = require('./base');
+    Base = require('./base'),
+    Index = require('../structures/Hash');
 
 var User = module.exports = Base.extend();
 
@@ -43,10 +44,14 @@ User.prototype.initialize = function() {
   var attrs = this.toJSON();
 
   // Make all usernames lowercase
-  attrs.username = attrs.username.toLowerCase();
+  if(attrs.username) {
+    attrs.username = attrs.username.toLowerCase();    
+  }
 
-  // Right now have the id be the username
-  attrs.id = attrs.username;
+  // If username is set, use that, otherwise generate one
+  if(!attrs.id) {
+    attrs.id = attrs.username || this.makeId(6);
+  }
 
   // Encrypt the password if given and we haven't already encrypted it.
   if(!attrs.salt && attrs.password) {
@@ -65,6 +70,40 @@ User.prototype.initialize = function() {
 };
 
 /*
+ * Save the index after save
+ * 
+ * fn - callback function 
+ *
+ */
+User.prototype.onSave = function(model, fn) {
+  var index,
+      wait = 0,
+      username = model.get('username'),
+      email = model.get('email');
+
+  function done(err) {
+    if(err) return fn(err);
+
+    else if(--wait <= 0) {
+      return fn(err, model);      
+    } 
+  }
+
+  if(username) {
+    wait++;
+    index = new Index('index:username:id');
+    index.set(username, model.id, done);
+  }
+
+  if(email) {
+    wait++;
+    index = new Index('index:email:id');
+    index.set(email, model.id, done);
+  }
+
+};
+
+/*
  * Authenticate
  */
 User.prototype.authenticate = function(enteredPassword) {
@@ -76,3 +115,26 @@ User.prototype.authenticate = function(enteredPassword) {
   // Return true if authenticated, false otherwise
   return (enteredPassword === attrs.password);
 };
+
+// Static Properties
+// -----------------
+
+User.exists = function(val, fn) {
+  var rEmail = /^[+a-zA-Z0-9_.-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,6}$/,
+      index = new Index();
+
+  // Is this an email address or username?
+  if(rEmail.test(val)) {
+    index.key = 'index:email:id';
+  } else {
+    index.key = 'index:username:id';
+  }
+
+  index.get(val, function(err, id) {
+    if(err) return fn(err);
+    return fn(null, id);
+  });
+
+};
+
+

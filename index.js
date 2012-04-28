@@ -2,7 +2,7 @@
  * Module Dependencies
  */
 var express = require('express'),
-    redis = require('redis'),
+    client = require('./support/client'),
     app = module.exports = express();
 
 /*
@@ -26,21 +26,13 @@ console.log("Server listening on port 8080");
 /*
  * Connect to redis
  */
-var redis = app.redis = redis.createClient(null, null, { detect_buffers : true });
 
 // Redis events
-redis.on('ready', function() {
-  console.log('Redis listening on port: %d', redis.port);
-
-  // Select which database we want to use
-  if(env === 'production')
-    redis.select(1);
-  else if (env === 'development')
-    redis.select(0);
-
+client.on('ready', function() {
+  console.log('Redis listening on port: %d', client.port);
 });
 
-redis.on('error', function() {
+client.on('error', function() {
   console.log('Redis: Unable to connect to redis database');
 });
 
