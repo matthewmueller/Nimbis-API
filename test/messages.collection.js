@@ -55,7 +55,7 @@ describe('Messages Collection', function() {
   // #fetch(fn)
   describe('#fetch', function() {
     it('should find a message by id', function(done) {
-      saveMessages(messages, function(err, models) {
+      messages.save(function(err, models) {
         if(err) return done(err);
         var ids = _(models).pluck('id'),
             col = [];
@@ -76,19 +76,6 @@ describe('Messages Collection', function() {
       });
     });
   });
-
-  // Utility: Save some messages
-  var saveMessages = function(messages, fn) {
-    var wait = messages.length,
-        out = [];
-    messages.each(function(message) {
-      message.save(function(err, model) {
-        if(err) return fn(err);
-        out.push(model.toJSON());
-        if(--wait <= 0) return fn(null, out);
-      });
-    });
-  };
 
   describe('#save()', function() {
     it('should save a new message', function(done) {
