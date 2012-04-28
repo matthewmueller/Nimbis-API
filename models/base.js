@@ -71,14 +71,7 @@ Base.prototype.save = function(options, fn) {
   var date = new Date(),
       method = 'update';
 
-  // Add timestamps
-  if(this.isNew()) {
-    method = 'create';
-    this.set('created_at', date, { silent : true });
-  }
-
-  this.set('modified_at', date, { silent : true });
-
+  // Allow options to be callback function
   if(_.isFunction(options)) {
     fn = options;
     options = {};
@@ -86,6 +79,15 @@ Base.prototype.save = function(options, fn) {
     options = _.clone(options);
   }
 
+  // Add timestamps
+  if(this.isNew()) {
+    method = 'create';
+    this.set('created_at', date, { silent : true });
+  }
+  this.set('modified_at', date, { silent : true });
+
+
+  // Sync the model with the database
   this.sync(method, options, function(err, model) {
     
     // Call hooks if available
@@ -106,6 +108,7 @@ Base.prototype.save = function(options, fn) {
 Base.prototype.fetch = function(options, fn) {
   if(_.isFunction(options)) fn = options;
 
+  // Sync the model with the database
   this.sync('read', options, function(err, model) {
 
     // Call hooks if available
@@ -116,6 +119,7 @@ Base.prototype.fetch = function(options, fn) {
     } else {
       fn(err, model);
     }
+
   });
 };
 
