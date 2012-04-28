@@ -18,6 +18,11 @@ User.prototype.access = {
 };
 
 /*
+ * Required values
+ */
+User.prototype.requires = ['name', 'email', 'password'];
+
+/*
  * Types
  */
 User.prototype.types = {
@@ -132,6 +137,8 @@ User.exists = function(val, fn) {
 
   index.get(val, function(err, id) {
     if(err) return fn(err);
+    if(!id) return fn(null, false);
+
     return fn(null, id);
   });
 

@@ -8,7 +8,7 @@
  * Module dependencies.
  */
 
-var client = require('../').redis;
+var client = require('../support/client');
 
 /**
  * A wrapper for the Redis list type.

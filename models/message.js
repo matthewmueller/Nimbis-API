@@ -1,13 +1,23 @@
-var Base = require('./base'),
-    redis = require('../').redis,
+var _ = require('underscore'),
+    Base = require('./base'),
+    List = require('../structures/list'),
     utils = require('../support/utils'),
-    after = utils.after,
-    _ = require('underscore');
+    after = utils.after;
 
 /*
  * Extend the base model
  */
 var Message = module.exports = Base.extend();
+
+/*
+ * Name of the model
+ */
+Message.prototype.name = 'message';
+
+/*
+ * Required attributes
+ */
+Message.prototype.requires = ['author', 'groups', 'message'];
 
 /*
  * Types
@@ -18,11 +28,6 @@ Message.prototype.types = {
   groups : Array,
   author : Object
 };
-
-/*
- * Name of the model
- */
-Message.prototype.name = 'message';
 
 /*
  * Initialize a message model
@@ -38,23 +43,24 @@ Message.prototype.initialize = function() {
 /*
  * Extend save to add messages to group lists
  */
-Message.prototype.save = function(options, fn) {
-  if(!redis.connected) fn(new Error('Redis not connected'));
+Message.prototype.onSave = function(model, fn) {
+  var groups = model.get('groups'),
+      list = new List(),
+      messageId = model.get('id'),
+      finished = after(groups.length);
 
-  var self = this,
-      groups = self.toJSON().groups,
-      _save  = Base.prototype.save;
+  function done(err) {
+    if(err) return fn(err);
+    else if(finished()) {
+      return fn(null, model);
+    }
+  };
 
-  if(!groups.length) return fn(new Error('No groups specified'));
-
-  var finished = after(groups.length);
-
-  _(groups).each(function(group) {
-    redis.lpush('l:group:'+ group +':messages', self.id, function(err) {
-      if(err) return fn(err);
-
-      // Pass on to base save
-      if(finished()) return _save.call(self, options, fn);
-    });
+  // Add messageID to each group
+  _.each(groups, function(group) {
+    // Example Key - list:group:sah123j:messages
+    list.key = 'list:group:'+ group +':messages';
+    list.unshift(messageId, done);
   });
+
 };
