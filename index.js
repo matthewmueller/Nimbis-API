@@ -79,10 +79,10 @@ var basicAuth = function(req, res, next) {
 /*
  * Controllers
  */
-var user = require('./controllers/users'),
-    group = require('./controllers/groups');
-    message = require('./controllers/messages'),
-    comment = require('./controllers/comments');
+var user = require('./controllers/user'),
+    group = require('./controllers/group'),
+    message = require('./controllers/message'),
+    comment = require('./controllers/comment');
 
 // Group
 app.get('/groups', basicAuth, group.index);
