@@ -89,7 +89,8 @@ var basicAuth = function(req, res, next) {
  */
 var user = require('./controllers/users'),
     group = require('./controllers/groups');
-    message = require('./controllers/messages');
+    message = require('./controllers/messages'),
+    comment = require('./controllers/comments');
 
 // Group
 app.get('/groups', basicAuth, group.index);
@@ -104,3 +105,7 @@ app.post('/join', basicAuth, user.join);
 // Messages
 app.post('/messages', basicAuth, message.create);
 app.get('/messages', basicAuth, message.index);
+
+// Comments
+app.post('/messages/:message/comments', basicAuth, comment.create);
+app.get('/messages/:message/comments', basicAuth, comment.index);

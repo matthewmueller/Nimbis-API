@@ -10,7 +10,8 @@
     "backbone" : "*",
     "passport" : "*",
     "redis" : "*",
-    "underscore" : "*"
+    "underscore" : "*",
+    "validator" : "*"
   },
   "devDependencies": {
     "request" : "*"
