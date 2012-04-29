@@ -67,6 +67,10 @@ Message.prototype.onSave = function(model, fn) {
 
 // Static Properties
 // -----------------
+Message.create = function(attrs, fn) {
+  var message = new Message(attrs);
+  message.save(fn);
+};
 
 Message.find = function(id, fn) {
   var message = new Message({ id : id });

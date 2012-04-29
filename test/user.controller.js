@@ -20,7 +20,6 @@ describe('User Controller', function() {
   describe('POST /users', function() {
 
     it('should create a new user', function(done) {
-      
       request(app)
         .post('/users')
         .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -44,7 +43,6 @@ describe('User Controller', function() {
   });
 
   describe('GET /users/:id', function() {
-
     it('should get a user by id', function(done) {
       var id = user.get('id');
 
@@ -62,6 +60,9 @@ describe('User Controller', function() {
 
   });
 
+  describe('POST /join', function() {
+
+  });
 
   // Flush the database after the test set
   after(function(done) {

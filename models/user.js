@@ -123,6 +123,10 @@ User.prototype.onSave = function(model, fn) {
 
 // Static Properties
 // -----------------
+User.create = function(attrs, fn) {
+  var user = new User(attrs);
+  user.save(fn);
+};
 
 User.find = function(id, fn) {
   var user = new User({ id : id });
