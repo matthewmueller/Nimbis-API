@@ -15,7 +15,7 @@ Group.prototype.name = 'group';
  */
 Group.prototype.requires = ['name', 'type'];
 
-/* 
+/*
  * Types of the attributes
  */
 Group.prototype.types = {

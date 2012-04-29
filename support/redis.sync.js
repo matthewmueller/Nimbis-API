@@ -10,9 +10,9 @@ exports = module.exports = function(method, options, fn) {
   var datastore = this;
 
   // Call a method based on the type of save
-  exports[method](datastore, options, function(err) {
+  exports[method](datastore, options, function(err, ds) {
     if(err) return fn(err);
-    return fn(null, datastore);
+    return fn(null, ds);
   });
 };
 
@@ -48,7 +48,9 @@ var _persist = exports._persist = function(ds, data, fn) {
   });
 
   // Save the hash
-  hash.set(data, fn);
+  hash.set(data, function(err) {
+    return fn(err, ds);
+  });
 };
 
 /*
@@ -66,7 +68,7 @@ exports.read = function(ds, options, fn) {
     if(ds.set) ds.set(json[0]);
     else ds.reset(json);
 
-    return fn();
+    return fn(null, ds);
   }
 
   _(models).each(function(model) {
@@ -79,7 +81,9 @@ exports.read = function(ds, options, fn) {
     
     hash.get(function(err, data) {
       if(err) return fn(err);
-      else if(_.isEmpty(data)) return fn(null, false);
+      else if(_.isEmpty(data)) {
+        return fn(null, false);
+      }
 
       _.each(data, function(value, attr) {
         // Hacky way to get stringified array back to an array

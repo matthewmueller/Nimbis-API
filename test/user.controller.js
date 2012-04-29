@@ -65,7 +65,7 @@ describe('User Controller', function() {
 
   describe('POST /join', function() {
     var group = { id : '123abc', name : 'Javascript'},
-        usergroup = { id : '123bc', color : 'purple', name : 'JS' };
+        usergroup = { id : '123abc', color : 'purple', name : 'JS' };
 
     it('should join a group that exists', function(done) {
       Group.create(group, function(err, model) {
@@ -76,7 +76,8 @@ describe('User Controller', function() {
           .set('Authorization', encodeBasicAuth('mattmuelle@gmail.com', 'test'))
           .write(JSON.stringify(usergroup))
           .end(function(res) {
-            console.log(res.body);
+            var body = JSON.parse(res.body);
+            expect(body.groups[0].id).to.be('123abc');
             done();
           });
 

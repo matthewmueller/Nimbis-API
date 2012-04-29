@@ -5,7 +5,7 @@ var expect = require('expect.js'),
 // Default user options
 var attrs = {
   name : 'Javascript'
-}
+};
 
 describe('Group Model', function() {
   var group = undefined;
@@ -46,7 +46,7 @@ describe('Group Model', function() {
       group.save(function(err, model) {
         if(err) return done(err);
         expect(model.get('name')).to.be('Javascript');
-        expect(model.get('created_at')).to.be.a(Date);        
+        expect(model.get('created_at')).to.be.a(Date);
         done();
       });
     });
@@ -76,7 +76,7 @@ describe('Group Model', function() {
     client.flushdb(function(err) {
       if(err) return done(err);
       done();
-    })
+    });
   });
 
 });

@@ -116,6 +116,7 @@ Base.prototype.fetch = function(options, fn) {
 
   // Sync the model with the database
   this.sync('read', options, function(err, model) {
+
     // Call hooks if available
     if(err && model.onError) {
       model.onError.call(model, err, fn);
