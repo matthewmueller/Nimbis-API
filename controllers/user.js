@@ -53,7 +53,7 @@ exports.join = function(req, res) {
 
   Group.exists(body.id, function(err, id) {
     if(err) return res.send(err);
-    else if(!id) return res.send('Group: ' + body.id + ' doesnt exist!');
+    else if(!id) return res.send(new Error('Group: ' + body.id + ' doesnt exist!'));
 
     // Add group to groups
     groups.push(body);
