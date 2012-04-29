@@ -28,27 +28,13 @@ var env = app.env = process.env.NODE_ENV || 'development';
  * DELETE  /:id              ->  destroy
  *
  */
+
 var User = require('./models/user');
-
-// var loadUser = function(username, password, fn) {
-//   user = new User({ username : username });
-
-//   user.fetch(function(err, user) {
-//     if(err) return fn(err);
-    
-//     if(user.authenticate(password)) {
-//       return fn(null, user);
-//     } else {
-//       return fn(null, false);
-//     }
-
-//   });
-// };
 
 /*
  * Basic authentication
  *
- * Kind of messy - will probably need to be refactored
+ * TODO: Replace with oAuth & browserID
  */
 var basicAuth = function() {
   express.basicAuth(function(user, pass, fn) {
