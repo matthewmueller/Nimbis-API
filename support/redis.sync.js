@@ -1,8 +1,6 @@
 var _ = require('underscore'),
     Hash = require('../structures/hash'),
     after = require('./utils').after,
-    isObject = _.isObject,
-    isArray  = Array.isArray,
     stringify = JSON.stringify,
     parse = JSON.parse;
 
@@ -22,35 +20,23 @@ exports = module.exports = function(method, options, fn) {
  * Create an entry
  */
 exports.create = function(ds, options, fn) {
-  var name = ds.name.toLowerCase(),
-      data = ds.toJSON(),
-      key  = [name, data.id].join(':');
-
-  // Create a new hash
-  var hash = new Hash(key);
-
-  // Any objects 2 levels deep, stringify
-  _.each(data, function(value, attr) {
-
-    if(isArray(value)) {
-      data[attr] = value.toString();
-    }
-    if(isObject(value)) {
-      data[attr] = stringify(value);
-    }
-
-  });
-
-  // Save the hash
-  hash.set(data, fn);
+  // Save the data attributes
+  _persist(ds, ds.toJSON(), fn);
 };
 
 /*
  * Update an entry
  */
 exports.update = function(ds, options, fn) {
+  // Save the changed attributes
+  _persist(ds, ds.changedAttributes(), fn);
+};
+
+/*
+ * Persist : Low-level helper for create/update
+ */
+var _persist = exports._persist = function(ds, data, fn) {
   var name = ds.name.toLowerCase(),
-      data = ds.changedAttributes(),
       key  = [name, data.id].join(':');
 
   // Create a new hash
@@ -58,14 +44,7 @@ exports.update = function(ds, options, fn) {
 
   // Any objects 2 levels deep, stringify
   _.each(data, function(value, attr) {
-
-    if(isArray(value)) {
-      data[attr] = value.toString();
-    }
-    if(isObject(value)) {
-      data[attr] = stringify(value);
-    }
-
+    data[attr] = stringify(value);
   });
 
   // Save the hash
@@ -104,9 +83,7 @@ exports.read = function(ds, options, fn) {
 
       _.each(data, function(value, attr) {
         // Hacky way to get stringified array back to an array
-        if(rArray.test(value)) {
-          data[attr] = parse(value);
-        }
+        data[attr] = parse(value);
       });
 
       // Recursive JSON.parse

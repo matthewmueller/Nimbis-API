@@ -32,7 +32,8 @@ describe('User Controller', function() {
           expect(body.id).to.be.ok();
           expect(body.salt).to.be.ok();
           expect(body.password).to.have.length(40);
-
+          expect(body.groups).to.be.an(Array);
+          expect(body.groups).to.be.empty();
           // Set the user for the rest of the tests
           user = new User(body);
 
@@ -55,6 +56,7 @@ describe('User Controller', function() {
           expect(body.email).to.be('mattmuelle@gmail.com');
           expect(body.id).to.be.ok();
           expect(body.username).to.not.be.ok();
+          expect(body.groups).to.be.an(Array);
           done();
         });
     });
@@ -63,7 +65,7 @@ describe('User Controller', function() {
 
   describe('POST /join', function() {
     var group = { id : '123abc', name : 'Javascript'},
-        usergroup = { id : '123abc', color : 'purple', name : 'JS' };
+        usergroup = { id : '123bc', color : 'purple', name : 'JS' };
 
     it('should join a group that exists', function(done) {
       Group.create(group, function(err, model) {
@@ -78,7 +80,7 @@ describe('User Controller', function() {
             done();
           });
 
-      })
+      });
     });
 
 
@@ -89,7 +91,7 @@ describe('User Controller', function() {
     client.flushdb(function(err) {
       if(err) return done(err);
       done();
-    })
+    });
   });
 
 });
