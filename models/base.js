@@ -20,13 +20,6 @@ Base.prototype.makeSalt = function() {
 };
 
 /*
- * Encrypt a string
- */
-Base.prototype.encrypt = function(salt, str) {
-  return crypto.createHmac('sha1', salt).update(str).digest('hex');
-};
-
-/*
  * Generate a id
  */
 Base.prototype.makeId = function(len) {
@@ -123,7 +116,6 @@ Base.prototype.fetch = function(options, fn) {
 
   // Sync the model with the database
   this.sync('read', options, function(err, model) {
-
     // Call hooks if available
     if(err && model.onError) {
       model.onError.call(model, err, fn);
@@ -134,5 +126,15 @@ Base.prototype.fetch = function(options, fn) {
     }
 
   });
+};
+
+// Static Properties
+// -----------------
+
+/*
+ * Encrypt a string
+ */
+Base.encrypt = function(salt, str) {
+  return crypto.createHmac('sha1', salt).update(str).digest('hex');
 };
 

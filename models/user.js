@@ -62,7 +62,7 @@ User.prototype.initialize = function() {
   if(!attrs.salt && attrs.password) {
     var salt = this.makeSalt();
 
-    attrs.password = this.encrypt(salt, attrs.password);
+    attrs.password = Base.encrypt(salt, attrs.password);
     attrs.salt = salt;
   }
 
@@ -111,15 +111,15 @@ User.prototype.onSave = function(model, fn) {
 /*
  * Authenticate
  */
-User.prototype.authenticate = function(enteredPassword) {
-  var attrs = this.toJSON();
+// User.prototype.authenticate = function(enteredPassword) {
+//   var attrs = this.toJSON();
 
-  // Encrypt the entered password
-  enteredPassword = this.encrypt(attrs.salt, enteredPassword);
+//   // Encrypt the entered password
+//   enteredPassword = this.encrypt(attrs.salt, enteredPassword);
 
-  // Return true if authenticated, false otherwise
-  return (enteredPassword === attrs.password);
-};
+//   // Return true if authenticated, false otherwise
+//   return (enteredPassword === attrs.password);
+// };
 
 // Static Properties
 // -----------------
@@ -142,11 +142,31 @@ User.exists = function(val, fn) {
 
   index.get(val, function(err, id) {
     if(err) return fn(err);
-    if(!id) return fn(null, false);
+    else if(!id) return fn(null, false);
 
     return fn(null, id);
   });
 
+};
+
+User.authenticate = function(username, pass, fn) {
+  User.exists(username, function(err, id) {
+    if(err || !id) return fn(err, id);
+
+    // Find the user by id
+    User.find(id, function(err, model) {
+      if(err) return fn(err);
+      var attrs = model.toJSON();
+
+      // Encrypt then check the password
+      if(Base.encrypt(attrs.salt, pass) === attrs.password) {
+        return fn(null, model);
+      } else {
+        return fn(null, false);
+      }
+
+    });
+  });
 };
 
 

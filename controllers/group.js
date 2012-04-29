@@ -8,7 +8,6 @@ exports.index = function(req, res) {
       groups = user.get('groups');
 
   res.send(groups);
-
 };
 
 // POST /groups

@@ -54,7 +54,7 @@ exports.read = function(ds, options, fn) {
 
   function done() {
     // If its a model, use set, if collection use reset
-    (ds.set) ? ds.set(json) : ds.reset(json);
+    (ds.set) ? ds.set(json[0]) : ds.reset(json);
     return fn();
   } 
 
