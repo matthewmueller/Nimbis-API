@@ -54,3 +54,11 @@ Group.find = function(id, fn) {
   var group = new Group({ id : id });
   group.fetch(fn);
 };
+
+Group.exists = function(id, fn) {
+  Group.find(id, function(err, group) {
+    // Normalize, kinda wierd for right now..
+    if(group) group = group.get('id');
+    fn(err, group);
+  });
+};

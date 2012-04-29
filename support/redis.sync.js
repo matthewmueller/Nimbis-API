@@ -32,7 +32,37 @@ exports.create = function(ds, options, fn) {
   // Any objects 2 levels deep, stringify
   _.each(data, function(value, attr) {
 
-    if(isArray(value) || isObject(value)) {
+    if(isArray(value)) {
+      data[attr] = value.toString();
+    }
+    if(isObject(value)) {
+      data[attr] = stringify(value);
+    }
+
+  });
+
+  // Save the hash
+  hash.set(data, fn);
+};
+
+/*
+ * Update an entry
+ */
+exports.update = function(ds, options, fn) {
+  var name = ds.name.toLowerCase(),
+      data = ds.changedAttributes(),
+      key  = [name, data.id].join(':');
+
+  // Create a new hash
+  var hash = new Hash(key);
+
+  // Any objects 2 levels deep, stringify
+  _.each(data, function(value, attr) {
+
+    if(isArray(value)) {
+      data[attr] = value.toString();
+    }
+    if(isObject(value)) {
       data[attr] = stringify(value);
     }
 
@@ -54,13 +84,16 @@ exports.read = function(ds, options, fn) {
 
   function done() {
     // If its a model, use set, if collection use reset
-    (ds.set) ? ds.set(json[0]) : ds.reset(json);
+    if(ds.set) ds.set(json[0]);
+    else ds.reset(json);
+
     return fn();
-  } 
+  }
 
   _(models).each(function(model) {
     var name = model.name.toLowerCase(),
-        key  = [name, model.id].join(':');
+        key  = [name, model.id].join(':'),
+        rArray = /^\[.*\]$/;
 
     // Update the hash key
     hash.key = key;
@@ -69,11 +102,18 @@ exports.read = function(ds, options, fn) {
       if(err) return fn(err);
       else if(_.isEmpty(data)) return fn(null, false);
 
+      _.each(data, function(value, attr) {
+        // Hacky way to get stringified array back to an array
+        if(rArray.test(value)) {
+          data[attr] = parse(value);
+        }
+      });
+
       // Recursive JSON.parse
       json.push(parse(stringify(data)));
 
       if(finished()) return done();
     });
 
-  }); 
+  });
 };

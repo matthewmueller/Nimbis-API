@@ -46,11 +46,11 @@ User.prototype.defaults = {
  * Initialize a user model
  */
 User.prototype.initialize = function() {
-  var attrs = this.toJSON();
+  var attrs = this.attributes;
 
   // Make all usernames lowercase
   if(attrs.username) {
-    attrs.username = attrs.username.toLowerCase();    
+    attrs.username = attrs.username.toLowerCase();
   }
 
   // If username is set, use that, otherwise generate one
@@ -66,18 +66,13 @@ User.prototype.initialize = function() {
     attrs.salt = salt;
   }
 
-  // Set up the index
-  if(attrs.email && attrs.username) {
-    this.index('email:username', attrs.email, attrs.username);
-  }
-
   this.set(attrs, { silent : true });
 };
 
 /*
  * Save the index after save
- * 
- * fn - callback function 
+ *
+ * fn - callback function
  *
  */
 User.prototype.onSave = function(model, fn) {
@@ -90,8 +85,8 @@ User.prototype.onSave = function(model, fn) {
     if(err) return fn(err);
 
     else if(--wait <= 0) {
-      return fn(err, model);      
-    } 
+      return fn(err, model);
+    }
   }
 
   if(username) {
@@ -133,6 +128,13 @@ User.find = function(id, fn) {
   user.fetch(fn);
 };
 
+/*
+ * Checks if an email or username exists
+ *
+ * Returns a callback fn(err, user)
+ *
+ * If the user doesn't exist, user will be false
+ */
 User.exists = function(val, fn) {
   var rEmail = /^[+a-zA-Z0-9_.-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,6}$/,
       index = new Index();

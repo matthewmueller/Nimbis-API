@@ -40,10 +40,10 @@ exports.show = function(req, res) {
 exports.join = function(req, res) {
   var body = req.body,
       user = req.user,
-      groups = user.get('groups');
+      groups = _.clone(user.get('groups'));
 
   var id = _(groups).find(function(group) {
-    return group.id === body.id;
+    return (group.id === body.id);
   });
 
   // If already exists, just return
@@ -51,21 +51,20 @@ exports.join = function(req, res) {
     return res.send(200);
   }
 
-  // Check if the group exists
-  var group = new Group(body);
-  group.fetch(function(err, model) {
-    if(!model) {
-      return res.send('Group: ' + body.id + ' doesnt exist!');
-    }
+  Group.exists(body.id, function(err, id) {
+    if(err) return res.send(err);
+    else if(!id) return res.send('Group: ' + body.id + ' doesnt exist!');
 
-    // Add to the group
+    // Add group to groups
     groups.push(body);
-    user.set('groups', groups);
 
-    // Save the user
+    // Silent, because we don't want to trigger change event right away
+    // Maybe later we can be more optimistic
+    user.set({ groups : groups }, { silent : true });
+
     user.save(function(err, model) {
-      if(err) throw err;
-      res.send(user);
+      if(err) return res.send(err);
+      res.send(model);
     });
   });
 

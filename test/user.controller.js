@@ -2,6 +2,7 @@ var expect = require('expect.js'),
     request = require('./support/request'),
     client = require('../support/client'),
     User = require('../models/user'),
+    Group = require('../models/group'),
     app = require('../app.js');
 
 function encodeBasicAuth(user, pass) {
@@ -61,6 +62,25 @@ describe('User Controller', function() {
   });
 
   describe('POST /join', function() {
+    var group = { id : '123abc', name : 'Javascript'},
+        usergroup = { id : '123abc', color : 'purple', name : 'JS' };
+
+    it('should join a group that exists', function(done) {
+      Group.create(group, function(err, model) {
+        
+        request(app)
+          .post('/join')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', encodeBasicAuth('mattmuelle@gmail.com', 'test'))
+          .write(JSON.stringify(usergroup))
+          .end(function(res) {
+            console.log(res.body);
+            done();
+          });
+
+      })
+    });
+
 
   });
 
