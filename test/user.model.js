@@ -8,10 +8,10 @@ var attrs = {
   name : 'Matt Mueller',
   email : 'mattmuelle@gmail.com',
   password : 'test'
-}
+};
 
 describe('User Model', function() {
-  var user = undefined;
+  var user;
 
   // Run before starting the suite
   before(function(done) {
@@ -46,7 +46,7 @@ describe('User Model', function() {
       user.save(function(err, model) {
         if(err) return done(err);
         expect(model.get('email')).to.be('mattmuelle@gmail.com');
-        expect(model.get('created_at')).to.be.a(Date);        
+        expect(model.get('created_at')).to.be.a(Date);
         done();
       });
     });
@@ -149,7 +149,7 @@ describe('User Model', function() {
     client.flushdb(function(err) {
       if(err) return done(err);
       done();
-    })
+    });
   });
 
 });

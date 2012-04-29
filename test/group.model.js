@@ -8,7 +8,7 @@ var attrs = {
 };
 
 describe('Group Model', function() {
-  var group = undefined;
+  var group;
 
   // Run before starting the suite
   before(function(done) {

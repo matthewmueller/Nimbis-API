@@ -10,7 +10,7 @@ function encodeBasicAuth(user, pass) {
 }
 
 describe('User Controller', function() {
-  var user = undefined;
+  var user;
 
   // Run before starting the suite
   before(function(done) {

@@ -14,7 +14,7 @@ var attrs = {
 };
 
 describe('Comment Model', function() {
-  var comment = undefined;
+  var comment;
 
   // Run before starting the suite
   before(function(done) {

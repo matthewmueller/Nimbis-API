@@ -23,7 +23,7 @@ var collection = [
 ];
 
 describe('Messages Collection', function() {
-  var messages = undefined;
+  var messages;
 
   // Run before starting the suite
   before(function(done) {

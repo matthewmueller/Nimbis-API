@@ -15,7 +15,7 @@ var attrs = {
 };
 
 describe('Message Model', function() {
-  var message = undefined;
+  var message;
 
   // Run before starting the suite
   before(function(done) {
@@ -52,7 +52,7 @@ describe('Message Model', function() {
       message.save(function(err, model) {
         if(err) return done(err);
         expect(model.get('message')).to.be('Hi world!');
-        expect(model.get('created_at')).to.be.a(Date);        
+        expect(model.get('created_at')).to.be.a(Date);
         done();
       });
     });
@@ -100,7 +100,7 @@ describe('Message Model', function() {
     client.flushdb(function(err) {
       if(err) return done(err);
       done();
-    })
+    });
   });
 
 });
