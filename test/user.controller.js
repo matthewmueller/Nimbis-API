@@ -30,10 +30,20 @@ describe('User Controller', function() {
 
     });
 
-  }); 
+  });
+
+  describe('GET /user/', function() {
+
+    it('should get a user by id', function(done) {
+
+      console.log('hi');
+      done();
+    });
+
+  });
 
 
-  // Flush the database after each test
+  // Flush the database after the test set
   after(function(done) {
     client.flushdb(function(err) {
       if(err) return done(err);
