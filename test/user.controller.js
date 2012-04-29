@@ -1,6 +1,7 @@
 var expect = require('expect.js'),
     request = require('./support/request'),
     client = require('../support/client'),
+    User = require('../models/user'),
     app = require('../app.js');
 
 function encodeBasicAuth(user, pass) {
@@ -8,6 +9,7 @@ function encodeBasicAuth(user, pass) {
 }
 
 describe('User Controller', function() {
+  var user = undefined;
 
   // Run before starting the suite
   before(function(done) {
@@ -24,7 +26,16 @@ describe('User Controller', function() {
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .write('name=Matt Mueller&email=mattmuelle@gmail.com&password=test')
         .end(function(res) {
-          console.log(res.body);
+          var body = JSON.parse(res.body);
+          expect(body.name).to.be('Matt Mueller');
+          expect(body.email).to.be('mattmuelle@gmail.com');
+          expect(body.id).to.be.ok();
+          expect(body.salt).to.be.ok();
+          expect(body.password).to.have.length(40);
+
+          // Set the user for the rest of the tests
+          user = new User(body);
+
           done();
         });
 
@@ -32,12 +43,21 @@ describe('User Controller', function() {
 
   });
 
-  describe('GET /user/', function() {
+  describe('GET /users/:id', function() {
 
     it('should get a user by id', function(done) {
+      var id = user.get('id');
 
-      console.log('hi');
-      done();
+      request(app)
+        .get('/users/'+id)
+        .end(function(res) {
+          var body = JSON.parse(res.body);
+          expect(body.name).to.be('Matt Mueller');
+          expect(body.email).to.be('mattmuelle@gmail.com');
+          expect(body.id).to.be.ok();
+          expect(body.username).to.not.be.ok();
+          done();
+        });
     });
 
   });

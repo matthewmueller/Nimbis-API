@@ -57,7 +57,7 @@ app.get('/groups/:id', group.show);
 
 // User
 app.post('/users', user.create);
-app.get('/users/:username', user.show);
+app.get('/users/:id', user.show);
 app.post('/join', basicAuth, user.join);
 
 // Messages

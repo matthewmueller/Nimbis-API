@@ -22,12 +22,12 @@ exports.create = function(req, res) {
 
 };
 
-// GET /users/:username
+// GET /users/:id
 // curl -HAccept:text/json localhost:8080/users/matt
 exports.show = function(req, res) {
   var params = req.params;
 
-  var user = new User({ username : params.username });
+  var user = new User({ id : params.id });
 
   user.fetch(function(err, model) {
     if(err) throw err;
