@@ -52,9 +52,14 @@ describe('User Controller', function() {
           groups : ['123456'],
           author : { name : 'Martha Stewart', id : '098654'}
         },
-        { 
+        {
           message : 'hello there',
           groups : ['654321', '123456'],
+          author: { name : 'Jim Bean', id : 'abcdefg'}
+        },
+        {
+          message : 'I shouldnt be found',
+          groups : ['abc123'],
           author: { name : 'Jim Bean', id : 'abcdefg'}
         }
       ];
@@ -72,6 +77,7 @@ describe('User Controller', function() {
 
           expect(msgs).to.contain('hi world!');
           expect(msgs).to.contain('hello there');
+          expect(msgs).to.not.contain('I shouldnt be found');
           expect(ids).to.have.length(2);
           done();
         });
