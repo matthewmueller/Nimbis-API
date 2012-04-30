@@ -52,3 +52,16 @@ Base.prototype.save = function(fn) {
     });
   });
 };
+
+// Static Properties
+// -----------------
+Base.create = function(collection, fn) {
+  collection = new this(collection);
+  collection.save(fn);
+};
+
+Base.find = function(ids, fn) {
+  ids = ids.map(function(id) { return { id : id }; });
+  var collection = new this(ids);
+  collection.fetch(fn);
+};

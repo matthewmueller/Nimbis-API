@@ -139,3 +139,13 @@ Base.encrypt = function(salt, str) {
   return crypto.createHmac('sha1', salt).update(str).digest('hex');
 };
 
+Base.create = function(attrs, fn) {
+  var model = new this(attrs);
+  model.save(fn);
+};
+
+Base.find = function(id, fn) {
+  var model = new this({ id : id });
+  model.fetch(fn);
+};
+

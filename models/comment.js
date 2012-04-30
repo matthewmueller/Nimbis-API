@@ -48,15 +48,3 @@ Comment.prototype.onSave = function(model, fn) {
   });
 
 };
-
-// Static Properties
-// -----------------
-Comment.create = function(attrs, fn) {
-  var comment = new Comment(attrs);
-  comment.save(fn);
-};
-
-Comment.find = function(id, fn) {
-  var comment = new Comment({ id : id });
-  comment.fetch(fn);
-};
