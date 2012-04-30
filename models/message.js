@@ -44,6 +44,7 @@ Message.prototype.initialize = function() {
  * Extend save to add messages to group lists
  */
 Message.prototype.onSave = function(model, fn) {
+
   var groups = model.get('groups'),
       list = new List(),
       messageId = model.get('id'),
@@ -54,7 +55,7 @@ Message.prototype.onSave = function(model, fn) {
     else if(finished()) {
       return fn(null, model);
     }
-  };
+  }
 
   // Add messageID to each group
   _.each(groups, function(group) {

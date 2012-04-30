@@ -95,7 +95,7 @@ Base.prototype.save = function(options, fn) {
 
   // Sync the model with the database
   this.sync(method, options, function(err, model) {
-    
+
     // Call hooks if available
     if(err && model.onError) {
       model.onError.call(model, err, fn);

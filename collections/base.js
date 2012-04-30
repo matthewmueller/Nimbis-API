@@ -35,10 +35,10 @@ Base.prototype.fetch = function(options, fn) {
 
 /*
  * Save a collection
- * 
+ *
  * Note: In order to not have to queue actions (update vs. create),
  * we will loop through the models and call their save methods
- * 
+ *
  */
 Base.prototype.save = function(fn) {
   var collection = this,
