@@ -15,7 +15,7 @@ var create = exports.create = function(options) {
 
   client.on('connect', function() {
     client.select(options.db || db);
-  })
+  });
 
   return client;
 };
