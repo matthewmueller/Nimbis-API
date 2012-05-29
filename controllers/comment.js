@@ -1,6 +1,6 @@
 var Comment = require('../models/comment');
 
-// POST /messages
+// POST /comments
 exports.create = function(req, res) {
   var body = req.body,
       messageId = req.params.message,
@@ -25,4 +25,5 @@ exports.create = function(req, res) {
   });
 };
 
+// GET /comments
 exports.index = function(req, res) {};

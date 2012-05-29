@@ -24,7 +24,7 @@ var user = {
   groups : groups
 };
 
-describe('User Controller', function() {
+describe('Message Controller', function() {
 
   // TODO: Clean up.. this is so ugly
   before(function(done) {
