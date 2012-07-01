@@ -146,7 +146,7 @@ User.exists = function(val, fn) {
 
 };
 
-User.authenticate = function(username, pass, fn) {
+User.authorize = function(username, pass, fn) {
   User.exists(username, function(err, id) {
     if(err || !id) return fn(err, id);
 
