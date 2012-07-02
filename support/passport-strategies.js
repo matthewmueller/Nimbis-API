@@ -2,7 +2,7 @@ var User = require('../models/user');
 
 exports.local = function() {
   var strategy = require('passport-local').Strategy;
-  return new strategy(function(user, pass, done) {
+  return new strategy({ usernameField : 'email' }, function(user, pass, done) {
     User.authorize(user, pass, done);
   });
 };

@@ -16,7 +16,7 @@ var env = app.env = process.env.NODE_ENV || 'development';
 var strategies = require('./support/passport-strategies');
 
 // Local session support
-passport.use(strategies.local);
+passport.use(strategies.local());
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -35,8 +35,8 @@ passport.deserializeUser(function(id, done) {
  * Configuration
  */
 app.configure(function() {
-  app.use(express.logger());
-  app.use(express.cookieParser());
+  app.use(express.logger('dev'));
+  app.use(express.cookieParser('keyboard cat'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.session({ secret: 'keyboard cat' }));
@@ -64,10 +64,9 @@ var User = require('./models/user');
  *
  * TODO: Replace with oAuth & browserID
  */
-var basicAuth = function() {
-  express.basicAuth(function(user, pass, fn) {
-    User.authorize(user, pass, fn);
-  }).apply(this, arguments);
+var isLoggedIn = function(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  return res.send(401);
 };
 
 /*
@@ -83,19 +82,19 @@ var authorize = require('./controllers/authorize'),
 app.post('/authorize', authorize);
 
 // Group
-app.get('/groups', basicAuth, group.index);
-app.post('/groups', basicAuth, group.create);
+app.get('/groups', isLoggedIn, group.index);
+app.post('/groups', isLoggedIn, group.create);
 app.get('/groups/:id', group.show);
 
 // User
 app.post('/users', user.create);
 app.get('/users/:id', user.show);
-app.post('/join', basicAuth, user.join);
+app.post('/join', isLoggedIn, user.join);
 
 // Messages
-app.post('/messages', basicAuth, message.create);
-app.get('/messages', basicAuth, message.index);
+app.post('/messages', isLoggedIn, message.create);
+app.get('/messages', isLoggedIn, message.index);
 
 // Comments
-app.post('/messages/:message/comments', basicAuth, comment.create);
-app.get('/messages/:message/comments', basicAuth, comment.index);
+app.post('/messages/:message/comments', isLoggedIn, comment.create);
+app.get('/messages/:message/comments', isLoggedIn, comment.index);
