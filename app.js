@@ -31,6 +31,14 @@ passport.deserializeUser(function(id, done) {
   User.find(id, done);
 });
 
+// Automatically create a session for the user:
+// id: emum2q, email: matt@matt.com, password: test
+var autologin = function(req, res, next) {
+  if(env !== 'development' || req.session.passport.user) return next();
+  req.session.passport.user = 'emum2q';
+  return next();
+};
+
 /*
  * Configuration
  */
@@ -41,6 +49,7 @@ app.configure(function() {
   app.use(express.methodOverride());
   app.use(express.session({ secret: 'keyboard cat' }));
   app.use(passport.initialize());
+  app.use(autologin); // Automatically login
   app.use(passport.session());
 });
 
@@ -60,9 +69,7 @@ app.configure(function() {
 var User = require('./models/user');
 
 /*
- * Basic authentication
- *
- * TODO: Replace with oAuth & browserID
+ * Check if the user is authenticated
  */
 var isLoggedIn = function(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
