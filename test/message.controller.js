@@ -1,16 +1,13 @@
 var expect = require('expect.js'),
     _ = require('underscore'),
     request = require('./support/request'),
+    authorize = require('./support/authorize'),
     client = require('../support/client'),
     User = require('../models/user'),
     Groups = require('../collections/groups'),
     Message = require('../models/message'),
     Messages = require('../collections/messages'),
     app = require('../app.js');
-
-function encodeBasicAuth(user, pass) {
-  return 'Basic ' + new Buffer(user + ':' + pass).toString('base64');
-}
 
 var groups = [
   { id : '123456', name : 'Javascript'},
@@ -25,24 +22,24 @@ var user = {
 };
 
 describe('Message Controller', function() {
+  var sessionId;
 
   // TODO: Clean up.. this is so ugly
   before(function(done) {
-    // Create some groups and a user
-    groups = new Groups(groups),
-    user = new User(user);
 
-    groups.save(function(err, collection) {
+    // Create the groups then create the user
+    Groups.create(groups, function(err) {
       if(err) return done(err);
-      user.save(function(err, model) {
+      User.create(user, function(err, model) {
         if(err) return done(err);
-
-        // Check if redis is ready
-        if(client.connected) return done();
-        client.on('ready', done);
-
+        authorize(user.email, user.password, function(err, sid) {
+          if(err) return done(err);
+          sessionId = sid;
+          done();
+        });
       });
     });
+
   });
 
   describe('GET /messages', function() {
@@ -69,7 +66,7 @@ describe('Message Controller', function() {
 
         request(app)
         .get('/messages')
-        .set('Authorization', encodeBasicAuth('mattmuelle@gmail.com', 'test'))
+        .set('Cookie', 'sessionId=' + sessionId)
         .end(function(res) {
           var body = JSON.parse(res.body),
               msgs = _(body).pluck('message'),
@@ -96,7 +93,7 @@ describe('Message Controller', function() {
 
       request(app)
         .post('/messages')
-        .set('Authorization', encodeBasicAuth('mattmuelle@gmail.com', 'test'))
+        .set('Cookie', 'sessionId=' + sessionId)
         .set('Content-Type', 'application/json')
         .write(JSON.stringify(message))
         .end(function(res) {

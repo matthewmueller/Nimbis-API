@@ -6,7 +6,7 @@ var expect = require('expect.js'),
 
 var userAttributes = {
   name : 'Matt Mueller',
-  email : 'matt@matt.com',
+  email : 'test@test.com',
   password : 'test'
 };
 
@@ -31,7 +31,7 @@ describe('Authorize controller', function() {
     request(app)
       .post('/authorize')
       .set('Content-Type', 'application/json')
-      .write(JSON.stringify({ email : 'matt@matt.com', password : 'test' }))
+      .write(JSON.stringify({ email : 'test@test.com', password : 'test' }))
       .end(function(res) {
         expect(res.headers['set-cookie']).to.be.ok();
         expect(res.headers['set-cookie']).to.match(/sessionId=[^;]+;/);
