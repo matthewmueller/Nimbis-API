@@ -1,21 +1,31 @@
 var expect = require('expect.js'),
     request = require('./support/request'),
+    authorize = require('./support/authorize'),
     client = require('../support/client'),
     User = require('../models/user'),
     Group = require('../models/group'),
     app = require('../app.js');
 
-function encodeBasicAuth(user, pass) {
-  return 'Basic ' + new Buffer(user + ':' + pass).toString('base64');
-}
+var userAttrs = {
+  name : 'Matt Mueller',
+  email : 'matt@matt.com',
+  password : 'test'
+};
 
 describe('User Controller', function() {
-  var user;
+  var user, sessionId;
 
-  // Run before starting the suite
+  // Create a test user and get their session ID
   before(function(done) {
-    if(client.connected) return done();
-    client.on('ready', done);
+    User.create(userAttrs, function(err, model) {
+      if(err) return done(err);
+      user = model;
+      authorize(userAttrs.email, userAttrs.password, function(err, sid) {
+        if(err) return done(err);
+        sessionId = sid;
+        done();
+      });
+    });
   });
 
   describe('POST /users', function() {
@@ -34,8 +44,6 @@ describe('User Controller', function() {
           expect(body.password).to.have.length(40);
           expect(body.groups).to.be.an(Array);
           expect(body.groups).to.be.empty();
-          // Set the user for the rest of the tests
-          user = new User(body);
 
           done();
         });
@@ -53,7 +61,7 @@ describe('User Controller', function() {
         .end(function(res) {
           var body = JSON.parse(res.body);
           expect(body.name).to.be('Matt Mueller');
-          expect(body.email).to.be('mattmuelle@gmail.com');
+          expect(body.email).to.be('matt@matt.com');
           expect(body.id).to.be.ok();
           expect(body.username).to.not.be.ok();
           expect(body.groups).to.be.an(Array);
@@ -67,21 +75,25 @@ describe('User Controller', function() {
     var group = { id : '123abc', name : 'Javascript'},
         usergroup = { id : '123abc', color : 'purple', name : 'JS' };
 
-    it('should join a group that exists', function(done) {
-      Group.create(group, function(err, model) {
-        
-        request(app)
-          .post('/join')
-          .set('Content-Type', 'application/json')
-          .set('Authorization', encodeBasicAuth('mattmuelle@gmail.com', 'test'))
-          .write(JSON.stringify(usergroup))
-          .end(function(res) {
-            var body = JSON.parse(res.body);
-            expect(body.groups[0].id).to.be('123abc');
-            done();
-          });
+    before(function(done) {
+      Group.create(group, done);
+    });
 
-      });
+    it('should join a group that exists', function(done) {
+        
+      request(app)
+        .post('/join')
+        .set('Content-Type', 'application/json')
+        .set('Cookie', 'sessionId=' + sessionId)
+        .write(JSON.stringify(usergroup))
+        .end(function(res) {
+          var body = JSON.parse(res.body);
+          expect(body.groups[0].id).to.be('123abc');
+          expect(body.groups[0].name).to.be('JS');
+          expect(body.groups[0].color).to.be('purple');
+          done();
+        });
+
     });
 
 
