@@ -3,6 +3,8 @@
  */
 var express = require('express'),
     passport = require('passport'),
+    RedisStore = require('connect-redis')(express),
+    client = require('./support/client'),
     app = module.exports = express();
 
 /*
@@ -31,12 +33,10 @@ passport.deserializeUser(function(id, done) {
   User.find(id, done);
 });
 
-// Automatically create a session for the user:
-// id: emum2q, email: matt@matt.com, password: test
-var autologin = function(req, res, next) {
-  if(env !== 'development' || req.session.passport.user) return next();
-  req.session.passport.user = 'emum2q';
-  return next();
+var sessionOptions = {
+  key : 'sessionId',
+  secret : 'blah',
+  store : new RedisStore({ client : client })
 };
 
 /*
@@ -44,12 +44,10 @@ var autologin = function(req, res, next) {
  */
 app.configure(function() {
   app.use(express.logger('dev'));
-  app.use(express.cookieParser('keyboard cat'));
   app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(express.session({ secret: 'keyboard cat' }));
+  app.use(express.cookieParser('keyboard cat'));
+  app.use(express.session(sessionOptions));
   app.use(passport.initialize());
-  app.use(autologin); // Automatically login
   app.use(passport.session());
 });
 
@@ -71,7 +69,7 @@ var User = require('./models/user');
 /*
  * Check if the user is authenticated
  */
-var isLoggedIn = function(req, res, next) {
+var isAuthorized = function(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   return res.send(401);
 };
@@ -89,19 +87,19 @@ var authorize = require('./controllers/authorize'),
 app.post('/authorize', authorize);
 
 // Group
-app.get('/groups', isLoggedIn, group.index);
-app.post('/groups', isLoggedIn, group.create);
+app.get('/groups', isAuthorized, group.index);
+app.post('/groups', isAuthorized, group.create);
 app.get('/groups/:id', group.show);
 
 // User
 app.post('/users', user.create);
 app.get('/users/:id', user.show);
-app.post('/join', isLoggedIn, user.join);
+app.post('/join', isAuthorized, user.join);
 
 // Messages
-app.post('/messages', isLoggedIn, message.create);
-app.get('/messages', isLoggedIn, message.index);
+app.post('/messages', isAuthorized, message.create);
+app.get('/messages', isAuthorized, message.index);
 
 // Comments
-app.post('/messages/:message/comments', isLoggedIn, comment.create);
-app.get('/messages/:message/comments', isLoggedIn, comment.index);
+app.post('/messages/:message/comments', isAuthorized, comment.create);
+app.get('/messages/:message/comments', isAuthorized, comment.index);

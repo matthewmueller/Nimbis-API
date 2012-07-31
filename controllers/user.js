@@ -8,7 +8,7 @@ exports.index = function(req, res) {
 };
 
 // POST /users
-// curl -d "email=matt&pass=test" localhost:8080/users
+// curl -d "name=matt&email=matt@matt.com&password=test" localhost:8080/users
 exports.create = function(req, res) {
   var body = req.body;
 

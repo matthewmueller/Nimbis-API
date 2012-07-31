@@ -28,7 +28,7 @@ describe('Message Controller', function() {
 
   // TODO: Clean up.. this is so ugly
   before(function(done) {
-    // Create some groups and a user 
+    // Create some groups and a user
     groups = new Groups(groups),
     user = new User(user);
 

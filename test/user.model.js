@@ -78,6 +78,32 @@ describe('User Model', function() {
 
   });
 
+  describe('#destroy(fn)', function() {
+
+    beforeEach(function(done) {
+      user.save(done);
+    });
+
+    it('should remove a user by id', function(done) {
+      var id = user.get('id');
+      User.find(id, function(err, model) {
+        expect(err).to.be(null);
+        expect(model.get('id')).to.equal(id);
+
+        user.destroy(function(err) {
+          expect(err).to.be(null);
+
+          User.find(id, function(err, model) {
+            expect(err).to.be(null);
+            expect(model).to.be(false);
+            done();
+          });
+        });
+
+      });
+    });
+  });
+
   // #fetch(fn)
   describe('#fetch', function() {
     it('should find a user by id', function(done) {
@@ -143,6 +169,8 @@ describe('User Model', function() {
       });
     });
   });
+
+  
 
   // Flush the database after each test
   after(function(done) {

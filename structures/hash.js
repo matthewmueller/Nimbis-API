@@ -38,7 +38,7 @@ var Hash = module.exports = function(key) {
 Hash.prototype.keys = function (callback) {
     client.hkeys(this.key, callback);
     return this;
-}
+};
 
 /**
  * Get an array of hash values.
@@ -51,7 +51,7 @@ Hash.prototype.keys = function (callback) {
 Hash.prototype.values = function (callback) {
     client.hvals(this.key, callback);
     return this;
-}
+};
 
 /**
  * Get the number of hash keys.
@@ -64,7 +64,7 @@ Hash.prototype.values = function (callback) {
 Hash.prototype.length = function (callback) {
     client.hlen(this.key, callback);
     return this;
-}
+};
 
 /**
  * Delete a hash key.
@@ -75,11 +75,18 @@ Hash.prototype.length = function (callback) {
  * @api public
  */
 
-Hash.prototype.delete = Hash.prototype.del = function (hash_key, callback) {
-    callback = callback || function () {};
+Hash.prototype['delete'] = Hash.prototype.del = function (hash_key, callback) {
+  callback = callback || function() {};
+  if(!hash_key) return this;
+
+  if(typeof hash_key === 'function') {
+    client.del(this.key, hash_key);
+  } else {
     client.hdel(this.key, hash_key, callback);
-    return this;
-}
+  }
+
+  return this;
+};
 
 /**
  * Checks whether a hash key exists.
@@ -93,7 +100,7 @@ Hash.prototype.delete = Hash.prototype.del = function (hash_key, callback) {
 Hash.prototype.exists = function (hash_key, callback) {
     client.hexists(this.key, hash_key, callback);
     return this;
-}
+};
 
 /**
  * Sets one or more key/value pairs.
@@ -120,7 +127,7 @@ Hash.prototype.set = function (hash_key, value, callback) {
         client.hset(this.key, hash_key, value, callback);
     }
     return this;
-}
+};
 
 /**
  * Sets a key/value pair if the key doesn't already exist.
@@ -136,7 +143,7 @@ Hash.prototype.add = function (hash_key, value, callback) {
     callback = callback || function () {};
     client.hsetnx(this.key, hash_key, value, callback);
     return this;
-}
+};
 
 /**
  * Gets one or more key/value pairs.
@@ -159,12 +166,12 @@ Hash.prototype.get = function (hash_key, callback) {
         callback = hash_key;
         client.hgetall(this.key, callback);
     } else if (Array.isArray(hash_key)) {
-        client.hmget(this.key, hash_key, callback)
+        client.hmget(this.key, hash_key, callback);
     } else {
         client.hget(this.key, hash_key, callback);
     }
     return this;
-}
+};
 
 /**
  * Increment the specified hash value.
@@ -185,7 +192,7 @@ Hash.prototype.incrBy = function (hash_key, amount, callback) {
     }
     client.hincrby(this.key, hash_key, amount, callback);
     return this;
-}
+};
 
 /**
  * Decrement the specified hash value.
@@ -206,4 +213,4 @@ Hash.prototype.decrBy = function (hash_key, amount, callback) {
     }
     client.hincrby(this.key, hash_key, -1 * amount, callback);
     return this;
-}
+};

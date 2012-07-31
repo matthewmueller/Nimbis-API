@@ -12,8 +12,9 @@
     "redis": "*",
     "underscore": "*",
     "validator": "*",
-    "passport-local": "~0.1.3",
-    "passport-http": "~0.1.3"
+    "connect-redis" : "*",
+    "passport-local": "*",
+    "passport-http": "*"
   },
   "devDependencies": {
     "mocha": "*",

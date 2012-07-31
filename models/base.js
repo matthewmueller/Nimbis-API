@@ -64,7 +64,7 @@ Base.prototype._validate = function(attrs, options) {
   }
 
   return false;
-}
+};
 
 Base.prototype.isValid = function() {
   return !!this._validate();
@@ -126,6 +126,25 @@ Base.prototype.fetch = function(options, fn) {
       fn(err, model);
     }
 
+  });
+};
+
+/*
+ * Destroy a particular model
+ */
+Base.prototype.destroy = function(options, fn) {
+  if(_.isFunction(options)) fn = options;
+
+  // Sync the model with the database
+  this.sync('delete', options, function(err, model) {
+    // Call hooks if available
+    if(err && model.onError) {
+      model.onError.call(model, err, fn);
+    } else if(!err && model.onDestroy) {
+      model.onDestroy.call(model, model, fn);
+    } else {
+      fn(err, model);
+    }
   });
 };
 
